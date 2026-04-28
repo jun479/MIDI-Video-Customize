@@ -345,7 +345,7 @@
       });
 
       input.addEventListener('change', (e) => {
-        const 파일 = e.target.파일;
+        const files = e.target.files;
         if (files && files.length > 0) {
           handler(files[0]);
         }
