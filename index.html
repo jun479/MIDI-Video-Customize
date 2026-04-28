@@ -3,1236 +3,360 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MIDI 비주얼 플레이어</title>
+  <title>Zorius MIDI 트리거 플레이어</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
-    /* =============================================
-       CSS VARIABLES & BASE RESET
-       ============================================= */
     :root {
-      --bg:         #05050d;
-      --surface:    #0c0c1a;
-      --surface2:   #13132a;
-      --surface3:   #1a1a38;
-      --border:     #1f1f45;
-      --border2:    #2a2a5a;
-      --accent:     #6c4df6;
-      --accent-glow:#8a70ff;
-      --accent2:    #ff5f3d;
-      --accent2g:   #ff8060;
-      --green:      #00e88f;
-      --text:       #dde0f0;
-      --text2:      #8890b0;
-      --text3:      #4a5078;
-      --note-base:  #4466dd;
-      --note-hi:    #ff9f43;
-      --mono:       'Space Mono', monospace;
-      --sans:       'DM Sans', sans-serif;
+      --bg: #05050d;
+      --surface: #0c0c1a;
+      --surface2: #13132a;
+      --surface3: #1a1a38;
+      --border: #1f1f45;
+      --border2: #2a2a5a;
+      --accent: #6c4df6;
+      --accent-glow: #8a70ff;
+      --accent2: #ff5f3d;
+      --accent2g: #ff8060;
+      --green: #00e88f;
+      --text: #dde0f0;
+      --text2: #8890b0;
+      --text3: #4a5078;
+      --radius: 12px;
     }
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: var(--sans);
-      min-height: 100vh;
+      font-family: 'DM Sans', sans-serif;
+      height: 100vh;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
-      overflow-x: hidden;
     }
 
-    /* Subtle noise overlay for texture */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    /* =============================================
-       HEADER
-       ============================================= */
-    .header {
-      position: relative;
-      z-index: 1;
+    header {
+      padding: 1.25rem 2rem;
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      padding: 18px 28px;
-      border-bottom: 1px solid var(--border);
-      background: linear-gradient(180deg, rgba(108,77,246,0.06) 0%, transparent 100%);
+      align-items: center;
+      background: linear-gradient(to bottom, rgba(5,5,13,0.9), transparent);
+      z-index: 100;
     }
 
-    .header-logo {
+    .status-badge {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      color: var(--text2);
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 0.6rem;
+    }
+    
+    /* 상태 표시 점: 애니메이션 없이 즉각적인 색상 변경을 위해 transition 제거 */
+    .status-dot { 
+      width: 10px; height: 10px; border-radius: 50%; background: #2a2a5a; 
+    }
+    .status-dot.active { background: var(--green); box-shadow: 0 0 10px var(--green); }
+    /* 노트 트리거 시 강조 색상 */
+    .status-dot.trigger { background: var(--accent2) !important; box-shadow: 0 0 15px var(--accent2) !important; }
+
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 1rem;
+      padding: 0 1rem 1rem 1rem;
+      position: relative;
     }
 
-    .header-logo .logo-icon {
-      width: 38px;
-      height: 38px;
-      background: linear-gradient(135deg, var(--accent), #a060ff);
-      border-radius: 10px;
+    .video-container {
+      position: relative;
+      background: black;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
-      box-shadow: 0 0 20px rgba(108,77,246,0.4);
     }
 
-    .header-logo h1 {
-      font-family: var(--mono);
-      font-size: 15px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      color: var(--text);
+    /* 애니메이션(transition) 완전 제거: 딱딱 끊기는 연출 */
+    #main-video {
+      max-width: 100%;
+      max-height: 100%;
+      transform: scaleX(1);
     }
 
-    .header-logo p {
-      font-size: 11px;
-      color: var(--text3);
-      font-family: var(--mono);
-      margin-top: 1px;
+    .canvas-container {
+      position: absolute;
+      bottom: 1.5rem;
+      left: 1.5rem;
+      right: 340px;
+      height: 120px;
+      background: rgba(12, 12, 26, 0.6);
+      backdrop-filter: blur(8px);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      pointer-events: none;
     }
+    canvas { width: 100%; height: 100%; }
 
-    .header-badge {
-      font-family: var(--mono);
-      font-size: 10px;
-      color: var(--text3);
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      border: 1px solid var(--border2);
-      padding: 4px 10px;
-      border-radius: 20px;
-    }
-
-    /* =============================================
-       MAIN LAYOUT
-       ============================================= */
-    .main {
-      position: relative;
-      z-index: 1;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-    }
-
-    /* =============================================
-       DROP ZONES
-       ============================================= */
-    .drop-zones {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1px;
-      background: var(--border);
-      border-bottom: 1px solid var(--border);
-    }
+    .sidebar { display: flex; flex-direction: column; gap: 1rem; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; }
 
     .drop-zone {
-      background: var(--surface);
-      padding: 26px 28px;
-      cursor: pointer;
-      transition: background 0.2s ease;
-      display: flex;
-      align-items: center;
-      gap: 18px;
-      min-height: 110px;
-      position: relative;
-      overflow: hidden;
-      user-select: none;
-    }
-
-    .drop-zone::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border: 2px dashed transparent;
-      border-radius: 0;
-      transition: border-color 0.2s;
-      pointer-events: none;
-    }
-
-    .drop-zone:hover { background: var(--surface2); }
-    .drop-zone:hover::after { border-color: var(--border2); }
-
-    .drop-zone.drag-over {
-      background: rgba(108, 77, 246, 0.08);
-    }
-    .drop-zone.drag-over::after {
-      border-color: var(--accent);
-    }
-
-    .drop-zone.loaded {
-      background: rgba(0, 232, 143, 0.04);
-    }
-    .drop-zone.loaded::after {
-      border-color: transparent;
-    }
-
-    /* Subtle gradient sweep animation on drag-over */
-    .drop-zone.drag-over::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(90deg, transparent 0%, rgba(108,77,246,0.1) 50%, transparent 100%);
-      animation: sweep 1.2s ease-in-out infinite;
-    }
-
-    @keyframes sweep {
-      0% { transform: translateX(-100%); }
-      100% { transform: translateX(100%); }
-    }
-
-    .dz-icon {
-      width: 52px;
-      height: 52px;
-      border-radius: 14px;
-      background: var(--surface3);
-      border: 1px solid var(--border2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      flex-shrink: 0;
+      border: 2px dashed var(--border2);
+      border-radius: 8px;
+      padding: 1.5rem;
+      text-align: center;
       transition: all 0.2s;
+      cursor: pointer;
+      margin-bottom: 0.75rem;
     }
-
-    .drop-zone.loaded .dz-icon {
-      background: rgba(0,232,143,0.1);
-      border-color: rgba(0,232,143,0.3);
-    }
-
-    .dz-text { flex: 1; min-width: 0; }
-
-    .dz-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 3px;
-    }
-
-    .dz-sub {
-      font-size: 12px;
-      color: var(--text3);
-      font-family: var(--mono);
-    }
-
-    .dz-info {
-      font-size: 11px;
-      font-family: var(--mono);
-      color: var(--green);
-      margin-top: 4px;
-    }
-
-    .dz-arrow {
-      color: var(--text3);
-      font-size: 20px;
-      transition: transform 0.2s, color 0.2s;
-    }
-
-    .drop-zone:hover .dz-arrow {
-      transform: translateX(4px);
-      color: var(--text2);
-    }
-
-    /* =============================================
-       STATUS BAR
-       ============================================= */
-    .status-bar {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 9px 28px;
-      border-bottom: 1px solid var(--border);
-      background: var(--surface);
-      font-size: 12px;
-      font-family: var(--mono);
-      color: var(--text2);
-    }
-
-    .status-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--text3);
-      flex-shrink: 0;
-      transition: background 0.3s, box-shadow 0.3s;
-    }
-
-    .status-dot.ok    { background: var(--green); box-shadow: 0 0 8px rgba(0,232,143,0.6); }
-    .status-dot.load  { background: var(--accent); box-shadow: 0 0 8px rgba(108,77,246,0.6); animation: pulse 1s infinite; }
-    .status-dot.error { background: var(--accent2); box-shadow: 0 0 8px rgba(255,95,61,0.6); }
-
-    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
-
-    /* =============================================
-       PIANO ROLL
-       ============================================= */
-    .piano-roll-section {
-      padding: 20px 28px;
-      border-bottom: 1px solid var(--border);
-      flex: 0 0 auto;
-    }
-
-    .section-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 12px;
-    }
-
-    .section-label {
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--text3);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .section-label::before {
-      content: '';
-      display: inline-block;
-      width: 3px;
-      height: 12px;
-      background: var(--accent);
-      border-radius: 2px;
-    }
-
-    .piano-roll-meta {
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--text3);
-      display: flex;
-      gap: 16px;
-    }
-
-    .piano-roll-meta span { color: var(--text2); }
-
-    #pianoRoll {
-      display: block;
-      width: 100%;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      cursor: crosshair;
-    }
-
-    /* =============================================
-       VIDEO SECTION
-       ============================================= */
-    .video-section {
-      padding: 0 28px 20px;
-      display: none;
-    }
-
-    .video-section.visible { display: block; }
-
-    #videoPlayer {
-      display: block;
-      width: 100%;
-      max-height: 360px;
-      object-fit: contain;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: #000;
-      transition: transform 0.06s ease;
-    }
-
-    /* =============================================
-       CONTROLS BAR
-       ============================================= */
-    .controls {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 16px 28px;
-      border-top: 1px solid var(--border);
-      background: var(--surface);
-      flex-wrap: wrap;
-      margin-top: auto;
-    }
+    .drop-zone:hover { border-color: var(--accent); background: var(--surface2); }
+    .drop-zone p { font-size: 0.85rem; color: var(--text2); }
+    .drop-zone.loaded { border-style: solid; border-color: var(--green); background: rgba(0, 232, 143, 0.05); }
 
     .btn {
-      font-family: var(--sans);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 10px 22px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 700;
-      transition: all 0.15s ease;
-      letter-spacing: 0.2px;
-      white-space: nowrap;
+      width: 100%; padding: 0.75rem; border-radius: 8px; border: none;
+      font-family: inherit; font-weight: 600; cursor: pointer;
+      transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
     }
+    .btn-primary { background: var(--accent); color: white; }
+    .btn-primary:disabled { background: var(--surface3); color: var(--text3); cursor: not-allowed; }
+    .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary.active { border-color: var(--accent2); background: rgba(255, 95, 61, 0.1); color: var(--accent2g); }
 
-    .btn:active { transform: scale(0.97); }
-
-    .btn-play {
-      background: var(--accent);
-      color: white;
-      min-width: 130px;
-      box-shadow: 0 0 0 rgba(108,77,246,0);
-      transition: all 0.2s ease;
-    }
-
-    .btn-play:hover:not(:disabled) {
-      background: var(--accent-glow);
-      box-shadow: 0 0 24px rgba(108,77,246,0.5);
-    }
-
-    .btn-play:disabled {
-      background: var(--surface3);
-      color: var(--text3);
-      cursor: not-allowed;
-      box-shadow: none;
-    }
-
-    .btn-play.playing {
-      background: var(--accent2);
-    }
-
-    .btn-play.playing:hover {
-      background: var(--accent2g);
-      box-shadow: 0 0 24px rgba(255,95,61,0.5);
-    }
-
-    .btn-flip {
-      background: var(--surface3);
-      color: var(--text2);
-      border: 1px solid var(--border2);
-    }
-
-    .btn-flip:hover {
-      border-color: var(--accent);
-      color: var(--text);
-    }
-
-    .btn-flip.active {
-      background: rgba(255, 95, 61, 0.12);
-      color: var(--accent2g);
-      border-color: var(--accent2);
-      box-shadow: 0 0 14px rgba(255,95,61,0.2);
-    }
-
-    .controls-divider {
-      width: 1px;
-      height: 28px;
-      background: var(--border);
-    }
-
-    .time-display {
-      font-family: var(--mono);
-      font-size: 14px;
-      color: var(--text2);
-      background: var(--surface3);
-      border: 1px solid var(--border2);
-      padding: 8px 14px;
-      border-radius: 8px;
-      min-width: 80px;
-      text-align: center;
-      letter-spacing: 1px;
-    }
-
-    .time-display.playing {
-      color: var(--accent-glow);
-      border-color: rgba(108,77,246,0.4);
-    }
-
-    .controls-info {
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--text3);
-      margin-left: auto;
-    }
-
-    .controls-info b { color: var(--text2); }
-
-    /* =============================================
-       LOADING OVERLAY
-       ============================================= */
-    #loadingOverlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(5,5,13,0.8);
-      backdrop-filter: blur(4px);
-      z-index: 999;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    #loadingOverlay.visible { display: flex; }
-
-    .loading-spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid var(--border2);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .loading-text {
-      font-family: var(--mono);
-      font-size: 12px;
-      color: var(--text2);
-      letter-spacing: 1px;
-    }
-
-    /* =============================================
-       SCROLLBAR
-       ============================================= */
-    ::-webkit-scrollbar { width: 5px; }
-    ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
-
-    /* =============================================
-       RESPONSIVE
-       ============================================= */
-    @media (max-width: 600px) {
-      .drop-zones { grid-template-columns: 1fr; }
-      .header { padding: 14px 16px; }
-      .header-badge { display: none; }
-      .piano-roll-section { padding: 14px 16px; }
-      .controls { padding: 12px 16px; gap: 8px; }
-      .controls-info { display: none; }
-    }
+    input[type="file"] { display: none; }
   </style>
 </head>
 <body>
 
-  <!-- Loading Overlay -->
-  <div id="loadingOverlay">
-    <div class="loading-spinner"></div>
-    <div class="loading-text" id="loadingText">처리 중...</div>
-  </div>
-
-  <!-- Header -->
-  <header class="header">
-    <div class="header-logo">
-      <div class="logo-icon">🎹</div>
-      <div>
-        <h1>MIDI 비주얼 플레이어</h1>
-        <p>Piano Roll · Sampler · Video Sync</p>
-      </div>
+  <header>
+    <h1 style="font-size: 1.1rem; font-weight: 700; letter-spacing: -0.5px;">ZORIUS <span style="color: var(--accent);">TRIGGER PLAYER</span></h1>
+    <div class="status-badge">
+      <div id="status-dot" class="status-dot"></div>
+      <span id="status-text">파일을 업로드 해주세요</span>
     </div>
-    <div class="header-badge">v1.0 · 브라우저 전용</div>
   </header>
 
-  <main class="main">
-
-    <!-- Drop Zones -->
-    <div class="drop-zones">
-      <div class="drop-zone" id="midiZone">
-        <div class="dz-icon" id="midiIcon">🎵</div>
-        <div class="dz-text">
-          <div class="dz-title" id="midiTitle">MIDI 파일 업로드</div>
-          <div class="dz-sub" id="midiSub">.mid 파일을 드래그하거나 클릭하세요</div>
-          <div class="dz-info" id="midiInfo" style="display:none"></div>
-        </div>
-        <div class="dz-arrow">›</div>
-      </div>
-
-      <div class="drop-zone" id="mediaZone">
-        <div class="dz-icon" id="mediaIcon">🎬</div>
-        <div class="dz-text">
-          <div class="dz-title" id="mediaTitle">MP3 또는 MP4 업로드</div>
-          <div class="dz-sub" id="mediaSub">.mp3 또는 .mp4 파일을 드래그하거나 클릭하세요</div>
-          <div class="dz-info" id="mediaInfo" style="display:none"></div>
-        </div>
-        <div class="dz-arrow">›</div>
+  <main>
+    <div class="video-container">
+      <video id="main-video" playsinline muted></video>
+      <div class="canvas-container">
+        <canvas id="piano-roll"></canvas>
       </div>
     </div>
 
-    <!-- Status Bar -->
-    <div class="status-bar">
-      <div class="status-dot" id="statusDot"></div>
-      <span id="statusMsg">MIDI 파일과 미디어 파일을 업로드하면 재생이 가능합니다</span>
-    </div>
+    <div class="sidebar">
+      <div class="card">
+        <label for="midi-input">
+          <div class="drop-zone" id="midi-zone">
+            <p id="midi-label">MIDI 파일을 드롭하세요</p>
+          </div>
+        </label>
+        <input type="file" id="midi-input" accept=".mid,.midi">
 
-    <!-- Piano Roll Section -->
-    <div class="piano-roll-section">
-      <div class="section-header">
-        <div class="section-label">피아노 롤 시각화</div>
-        <div class="piano-roll-meta" id="pianoMeta" style="display:none">
-          노트 <span id="metaNotes">0</span>개 &nbsp;·&nbsp;
-          길이 <span id="metaDuration">0.0</span>초 &nbsp;·&nbsp;
-          BPM <span id="metaBpm">?</span>
-        </div>
+        <label for="media-input">
+          <div class="drop-zone" id="media-zone">
+            <p id="media-label">MP3 또는 MP4 파일을 드롭하세요</p>
+          </div>
+        </label>
+        <input type="file" id="media-input" accept="video/*,audio/*">
       </div>
-      <canvas id="pianoRoll" height="220"></canvas>
-    </div>
 
-    <!-- Video Section -->
-    <div class="video-section" id="videoSection">
-      <div class="section-header">
-        <div class="section-label">영상 플레이어</div>
-      </div>
-      <video id="videoPlayer" muted playsinline></video>
-    </div>
-
-    <!-- Controls -->
-    <div class="controls">
-      <button class="btn btn-play" id="playBtn" disabled>
-        <span id="playIcon">▶</span>
-        <span id="playLabel">재생</span>
-      </button>
-
-      <button class="btn btn-flip" id="flipBtn">
-        <span>⇄</span>
-        <span id="flipLabel">플립 모드: 꺼짐</span>
-      </button>
-
-      <div class="controls-divider"></div>
-
-      <div class="time-display" id="timeDisplay">00:00</div>
-
-      <div class="controls-info" id="controlsInfo">
-        루트 노트: <b id="infoRoot">—</b> &nbsp;|&nbsp; 샘플러 <b id="infoSampler">대기 중</b>
+      <div class="card">
+        <button id="play-btn" class="btn btn-primary" disabled>재생 버튼</button>
+        <div style="height: 0.75rem;"></div>
+        <button id="flip-btn" class="btn btn-secondary">좌우 반전 모드 토글</button>
       </div>
     </div>
-
   </main>
 
-  <!-- Hidden file inputs -->
-  <input type="file" id="midiInput" accept=".mid,.midi" style="display:none">
-  <input type="file" id="mediaInput" accept=".mp3,.mp4,audio/mpeg,video/mp4" style="display:none">
-
-  <!-- External Libraries -->
-  <script src="https://unpkg.com/tone@14.8.49/build/Tone.js"></script>
-  <script src="https://unpkg.com/@tonejs/midi@2.0.6/build/Midi.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+  <script src="https://unpkg.com/@tonejs/midi"></script>
 
   <script>
-    // Wait for all scripts to load before initializing
-    document.addEventListener('DOMContentLoaded', function() {
-      // Check if libraries are loaded
-      if (typeof Tone === 'undefined' || typeof Midi === 'undefined') {
-        console.error('External libraries failed to load');
-        return;
+    const $ = id => document.getElementById(id);
+    const APP = {
+      midi: null, synths: [], isPlaying: false, 
+      isFlipMode: false, currentFlip: 1,
+      midiLoaded: false, mediaLoaded: false
+    };
+
+    const EL = {
+      video: $('main-video'),
+      canvas: $('piano-roll'),
+      ctx: $('piano-roll').getContext('2d'),
+      playBtn: $('play-btn'),
+      flipBtn: $('flip-btn'),
+      midiZone: $('midi-zone'),
+      mediaZone: $('media-zone'),
+      midiInput: $('midi-input'),
+      mediaInput: $('media-input'),
+      statusText: $('status-text'),
+      statusDot: $('status-dot')
+    };
+
+    function setStatus(msg, active = false) {
+      EL.statusText.textContent = msg;
+      if (active) EL.statusDot.classList.add('active');
+      else EL.statusDot.classList.remove('active');
+    }
+
+    async function handleMidi(file) {
+      if (!file) return;
+      const arrayBuffer = await file.arrayBuffer();
+      APP.midi = new Midi(arrayBuffer);
+      APP.midiLoaded = true;
+      $('midi-label').textContent = file.name;
+      EL.midiZone.classList.add('loaded');
+      checkReady();
+    }
+
+    async function handleMedia(file) {
+      if (!file) return;
+      const url = URL.createObjectURL(file);
+      EL.video.src = url;
+      APP.mediaLoaded = true;
+      $('media-label').textContent = file.name;
+      EL.mediaZone.classList.add('loaded');
+      checkReady();
+    }
+
+    function checkReady() {
+      if (APP.midiLoaded && APP.mediaLoaded) {
+        EL.playBtn.disabled = false;
+        setStatus('재생 준비 완료');
       }
-
-      // ================================================
-      // APPLICATION STATE
-      // ================================================
-      const APP = {
-        midiData:     null,       // Parsed Midi object from @tonejs/midi
-        audioBuffer:  null,       // Decoded Web Audio API AudioBuffer
-        mediaType:    null,       // 'audio' | 'video'
-        isPlaying:    false,
-        isFlipMode:   false,
-        flipState:    1,          // Current scaleX (1 or -1)
-        allNotes:     [],         // Flat array of all MIDI notes, sorted by time
-        activeNotes:  new Set(),  // Notes currently playing (for piano roll highlight)
-        rootNote:     60,         // Sampler reference pitch (median MIDI note)
-        noteMin:      21,         // Piano roll Y-axis min (MIDI note number)
-        noteMax:      108,        // Piano roll Y-axis max
-        totalDuration: 0,         // MIDI duration in seconds
-        masterGain:   null,       // Raw AudioContext GainNode for sampler output
-        animFrameId:  null,       // requestAnimationFrame ID
-        tempo:        120,        // BPM for grid drawing
-      };
-
-      // ================================================
-      // DOM REFERENCES
-      // ================================================
-      const $ = id => document.getElementById(id);
-      const EL = {
-        midiZone:   $('midiZone'),
-        mediaZone:  $('mediaZone'),
-        midiInput:  $('midiInput'),
-        mediaInput: $('mediaInput'),
-        canvas:     $('pianoRoll'),
-        videoSec:   $('videoSection'),
-        video:      $('videoPlayer'),
-        playBtn:    $('playBtn'),
-        flipBtn:    $('flipBtn'),
-        statusDot:  $('statusDot'),
-        statusMsg:  $('statusMsg'),
-        timeDisp:   $('timeDisplay'),
-        loadOver:   $('loadingOverlay'),
-        loadText:   $('loadingText'),
-      };
-
-      const PRC = EL.canvas.getContext('2d');
-
-      // ================================================
-      // STATUS / UI HELPERS
-      // ================================================
-      function setStatus(msg, type = 'idle') {
-        EL.statusMsg.textContent = msg;
-        EL.statusDot.className = 'status-dot' + (type !== 'idle' ? ` ${type}` : '');
-      }
-
-      function showLoading(msg) {
-        $('loadingText').textContent = msg;
-        EL.loadOver.classList.add('visible');
-      }
-
-      function hideLoading() {
-        EL.loadOver.classList.remove('visible');
-      }
-
-      function formatTime(s) {
-        if (isNaN(s) || s < 0) s = 0;
-        const m = Math.floor(s / 60).toString().padStart(2, '0');
-        const sec = Math.floor(s % 60).toString().padStart(2, '0');
-        return `${m}:${sec}`;
-      }
-
-      // MIDI note number → name (e.g. 60 → C4)
-      function noteName(midi) {
-        const N = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
-        return N[midi % 12] + (Math.floor(midi / 12) - 1);
-      }
-
-      // ================================================
-      // DROP ZONE SETUP
-      // ================================================
-      function setupDropZone(zone, input, handler) {
-        zone.addEventListener('click', () => input.click());
-        input.addEventListener('change', e => {
-          if (e.target.files[0]) handler(e.target.files[0]);
-          e.target.value = '';
-        });
-        zone.addEventListener('dragover', e => {
-          e.preventDefault();
-          zone.classList.add('drag-over');
-        });
-        zone.addEventListener('dragleave', e => {
-          if (!zone.contains(e.relatedTarget)) zone.classList.remove('drag-over');
-        });
-        zone.addEventListener('drop', e => {
-          e.preventDefault();
-          zone.classList.remove('drag-over');
-          if (e.dataTransfer.files[0]) handler(e.dataTransfer.files[0]);
-        });
-      }
-
-      // ================================================
-      // MIDI FILE HANDLING
-      // ================================================
-      async function handleMidiFile(file) {
-        if (!file.name.match(/\.(mid|midi)$/i)) {
-          setStatus('❌ .mid 또는 .midi 파일만 지원합니다', 'error');
-          return;
-        }
-
-        showLoading('MIDI 파일 분석 중...');
-        setStatus('MIDI 파일 분석 중...', 'load');
-
-        try {
-          const buf = await file.arrayBuffer();
-          APP.midiData = new Midi(buf);
-
-          // Flatten all notes from all tracks
-          APP.allNotes = [];
-          APP.midiData.tracks.forEach(track => {
-            track.notes.forEach(n => {
-              APP.allNotes.push({
-                midi:     n.midi,
-                time:     n.time,       // seconds
-                duration: n.duration,   // seconds
-                velocity: n.velocity,   // 0..1
-              });
-            });
-          });
-          APP.allNotes.sort((a, b) => a.time - b.time);
-          APP.totalDuration = APP.midiData.duration || 1;
-
-          // Get tempo for grid rendering
-          const tempos = APP.midiData.header?.tempos;
-          APP.tempo = (tempos && tempos.length) ? tempos[0].bpm : 120;
-
-          // Determine Y-axis range (with padding)
-          const pitches = APP.allNotes.map(n => n.midi);
-          APP.noteMin = Math.max(0,   Math.min(...pitches) - 4);
-          APP.noteMax = Math.min(127, Math.max(...pitches) + 4);
-
-          // Root note = median pitch (minimises pitch-shift artefacts)
-          const sorted = [...pitches].sort((a, b) => a - b);
-          APP.rootNote = sorted[Math.floor(sorted.length / 2)];
-
-          // Update UI
-          EL.midiZone.classList.add('loaded');
-          $('midiIcon').textContent = '✅';
-          $('midiTitle').textContent = file.name;
-          $('midiSub').textContent = `.mid · ${APP.allNotes.length}노트 · ${APP.totalDuration.toFixed(1)}초`;
-          $('midiInfo').textContent = `루트: ${noteName(APP.rootNote)}  |  BPM: ${APP.tempo.toFixed(0)}`;
-          $('midiInfo').style.display = 'block';
-
-          // Update meta bar
-          $('metaNotes').textContent    = APP.allNotes.length;
-          $('metaDuration').textContent = APP.totalDuration.toFixed(1);
-          $('metaBpm').textContent      = APP.tempo.toFixed(0);
-          $('pianoMeta').style.display  = 'flex';
-          $('infoRoot').textContent     = noteName(APP.rootNote);
-
-          // Draw piano roll
-          resizeCanvas();
-          drawPianoRoll(0);
-          checkReady();
-          setStatus(`MIDI 로드 완료 — ${APP.allNotes.length}개 노트 · ${APP.totalDuration.toFixed(1)}초`, 'ok');
-
-        } catch (e) {
-          setStatus('❌ MIDI 파일 로드 실패: ' + e.message, 'error');
-          console.error(e);
-        } finally {
-          hideLoading();
-        }
-      }
-
-      // ================================================
-      // MEDIA FILE HANDLING (MP3 or MP4)
-      // ================================================
-      async function handleMediaFile(file) {
-        const isVid = file.type.includes('video') || file.name.match(/\.mp4$/i);
-        const isAud = file.type.includes('audio') || file.name.match(/\.mp3$/i);
-
-        if (!isVid && !isAud) {
-          setStatus('❌ MP3 또는 MP4 파일만 지원합니다', 'error');
-          return;
-        }
-
-        APP.mediaType = isVid ? 'video' : 'audio';
-        showLoading('오디오 디코딩 중… (파일 크기에 따라 시간이 걸릴 수 있습니다)');
-        setStatus('미디어 파일 디코딩 중...', 'load');
-
-        try {
-          // Ensure AudioContext is running (requires user gesture — file upload counts)
-          await Tone.start();
-
-          // If video: set up the <video> element for visual playback
-          if (isVid) {
-            const url = URL.createObjectURL(file);
-            EL.video.src = url;
-            EL.video.muted = true;
-            EL.videoSec.classList.add('visible');
-
-            await new Promise((resolve) => {
-              EL.video.onloadeddata = resolve;
-              EL.video.onerror = resolve;       // Don't block on error
-              setTimeout(resolve, 5000);        // Timeout fallback
-            });
-          } else {
-            EL.videoSec.classList.remove('visible');
-          }
-
-          // Decode audio into AudioBuffer for sampler (works for both MP3 & MP4)
-          const rawCtx = Tone.context.rawContext;
-          const arrayBuf = await file.arrayBuffer();
-          APP.audioBuffer = await rawCtx.decodeAudioData(arrayBuf);
-
-          // Update UI
-          EL.mediaZone.classList.add('loaded');
-          $('mediaIcon').textContent  = isVid ? '🎬' : '🎵';
-          $('mediaTitle').textContent = file.name;
-          $('mediaSub').textContent   = `${isVid ? 'MP4 영상' : 'MP3 오디오'} · ${APP.audioBuffer.duration.toFixed(1)}초`;
-          $('mediaInfo').textContent  = `샘플레이트: ${APP.audioBuffer.sampleRate} Hz · 준비 완료`;
-          $('mediaInfo').style.display = 'block';
-          $('infoSampler').textContent = '준비 완료';
-
-          checkReady();
-          setStatus(`미디어 로드 완료 — ${isVid ? '영상' : '오디오'} 샘플러 활성화`, 'ok');
-
-        } catch (e) {
-          setStatus('❌ 미디어 로드 실패: ' + e.message, 'error');
-          console.error(e);
-        } finally {
-          hideLoading();
-        }
-      }
-
-      // ================================================
-      // READY CHECK
-      // ================================================
-      function checkReady() {
-        if (APP.midiData && APP.audioBuffer) {
-          EL.playBtn.disabled = false;
-          setStatus('✅ 준비 완료 — 재생 버튼을 눌러 시작하세요', 'ok');
-        }
-      }
-
-      // ================================================
-      // PIANO ROLL DRAWING
-      // ================================================
-      function resizeCanvas() {
-        const wrapper = EL.canvas.parentElement;
-        EL.canvas.width  = wrapper.clientWidth - 56; // account for 28px × 2 padding
-        EL.canvas.height = 220;
-      }
-
-      function drawPianoRoll(currentTime) {
-        const W = EL.canvas.width;
-        const H = EL.canvas.height;
-        const ctx = PRC;
-
-        // Background
-        ctx.fillStyle = '#070712';
-        ctx.fillRect(0, 0, W, H);
-
-        // Empty state
-        if (!APP.allNotes.length) {
-          ctx.fillStyle = '#1a1a3a';
-          ctx.font = '13px Space Mono, monospace';
-          ctx.textAlign = 'center';
-          ctx.fillText('MIDI 파일을 업로드하면 피아노 롤이 여기에 표시됩니다', W / 2, H / 2);
-          return;
-        }
-
-        const duration  = APP.totalDuration || 1;
-        const noteRange = APP.noteMax - APP.noteMin || 1;
-        const noteH     = H / noteRange;
-
-        // ── Black-key row shading ──
-        for (let n = APP.noteMin; n <= APP.noteMax; n++) {
-          const pos = n % 12;
-          if ([1, 3, 6, 8, 10].includes(pos)) {
-            const y = H - ((n - APP.noteMin) / noteRange) * H;
-            ctx.fillStyle = 'rgba(0,0,0,0.22)';
-            ctx.fillRect(0, y - noteH / 2, W, noteH);
-          }
-        }
-
-        // ── Octave grid lines & labels ──
-        for (let n = APP.noteMin; n <= APP.noteMax; n++) {
-          if (n % 12 === 0) {
-            const y = H - ((n - APP.noteMin) / noteRange) * H;
-            ctx.strokeStyle = '#1e1e40';
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(0, y);
-            ctx.lineTo(W, y);
-            ctx.stroke();
-
-            // Octave label
-            ctx.fillStyle = '#28285a';
-            ctx.font = '9px Space Mono, monospace';
-            ctx.textAlign = 'left';
-            ctx.fillText('C' + (Math.floor(n / 12) - 1), 4, y - 2);
-          }
-        }
-
-        // ── Beat / bar grid lines ──
-        const beatDur = 60 / (APP.tempo || 120);
-        for (let t = 0; t <= duration + beatDur; t += beatDur) {
-          const x = (t / duration) * W;
-          const isBar = Math.round(t / beatDur) % 4 === 0;
-          ctx.strokeStyle = isBar ? '#1a1a38' : '#111126';
-          ctx.lineWidth = 1;
-          ctx.beginPath();
-          ctx.moveTo(x, 0);
-          ctx.lineTo(x, H);
-          ctx.stroke();
-        }
-
-        // ── Notes ──
-        for (const note of APP.allNotes) {
-          const x    = (note.time / duration) * W;
-          const nw   = Math.max(2, (note.duration / duration) * W - 1);
-          const y    = H - ((note.midi - APP.noteMin) / noteRange) * H;
-          const nh   = Math.max(2, noteH - 1);
-          const top  = y - nh / 2;
-
-          const isActive = APP.activeNotes.has(note);
-
-          if (isActive) {
-            // Glowing active note
-            ctx.shadowColor = 'rgba(255,175,70,0.8)';
-            ctx.shadowBlur  = 10;
-            ctx.fillStyle   = '#ffa733';
-            ctx.fillRect(x, top, nw, nh);
-            ctx.shadowBlur  = 0;
-
-            // Bright top edge
-            ctx.fillStyle = 'rgba(255,255,200,0.6)';
-            ctx.fillRect(x, top, nw, 1);
-          } else {
-            // Inactive note — gradient colour by pitch
-            const t  = (note.midi - APP.noteMin) / noteRange;
-            // Low notes = deep indigo, High notes = sky blue-cyan
-            const r  = Math.floor(50  + t * 50);
-            const g  = Math.floor(80  + t * 120);
-            const b  = Math.floor(220 - t * 40);
-            const al = 0.5 + note.velocity * 0.45;
-
-            ctx.fillStyle = `rgba(${r},${g},${b},${al})`;
-            ctx.fillRect(x, top, nw, nh);
-
-            // Subtle top highlight
-            ctx.fillStyle = `rgba(${r + 60},${g + 60},${b + 20},${al * 0.4})`;
-            ctx.fillRect(x, top, nw, 1);
-          }
-        }
-
-        // ── Playhead ──
-        if (currentTime >= 0) {
-          const px = Math.min(W - 1, (currentTime / duration) * W);
-
-          // Glow line
-          ctx.strokeStyle = 'rgba(255, 75, 75, 0.9)';
-          ctx.lineWidth = 2;
-          ctx.shadowColor = 'rgba(255,75,75,0.7)';
-          ctx.shadowBlur  = 10;
-          ctx.beginPath();
-          ctx.moveTo(px, 0);
-          ctx.lineTo(px, H);
-          ctx.stroke();
-          ctx.shadowBlur = 0;
-
-          // Triangle at top
-          ctx.fillStyle = 'rgba(255,75,75,0.9)';
-          ctx.beginPath();
-          ctx.moveTo(px - 5, 0);
-          ctx.lineTo(px + 5, 0);
-          ctx.lineTo(px, 9);
-          ctx.closePath();
-          ctx.fill();
-        }
-      }
-
-      // ================================================
-      // AUDIO SCHEDULING via Tone.Transport
-      // ================================================
-      function scheduleAllNotes() {
-        // Cancel any previous scheduled events
-        Tone.Transport.cancel();
-        APP.activeNotes.clear();
-
-        // Get the raw Web Audio context for buffer-source playback
-        const rawCtx = Tone.context.rawContext;
-
-        // (Re)create the master gain node for this playback session
-        if (APP.masterGain) {
-          try { APP.masterGain.disconnect(); } catch (_) {}
-        }
-        APP.masterGain = rawCtx.createGain();
-        APP.masterGain.gain.value = 0.72;
-        APP.masterGain.connect(rawCtx.destination);
-
-        // Schedule each MIDI note as a separate AudioBufferSourceNode.
-        // This is the correct Web Audio approach for polyphonic sampler playback —
-        // each source is lightweight and auto-disposes after it finishes.
-        for (const note of APP.allNotes) {
-          Tone.Transport.schedule((audioTime) => {
-            // ── Audio: create a fresh source for this note ──
-            const src = rawCtx.createBufferSource();
-            src.buffer = APP.audioBuffer;
-
-            // Pitch shift: playbackRate = 2^(semitones/12)
-            const semitones = note.midi - APP.rootNote;
-            src.playbackRate.value = Math.pow(2, semitones / 12);
-
-            // Per-note velocity gain
-            const gainNode = rawCtx.createGain();
-            gainNode.gain.value = note.velocity * 0.92;
-
-            src.connect(gainNode);
-            gainNode.connect(APP.masterGain);
-
-            // Start and stop the source at the correct audio time
-            src.start(audioTime);
-            const stopAt = audioTime + Math.max(0.05, note.duration) + 0.15;
-            src.stop(stopAt);
-
-            // ── Visuals: approximate with setTimeout ──
-            // The difference (audioTime - rawCtx.currentTime) is how many ms until
-            // the note actually starts. This syncs the visual highlight precisely.
-            const msDelay = Math.max(0, (audioTime - rawCtx.currentTime) * 1000);
-
-            setTimeout(() => {
-              if (!APP.isPlaying) return;             // Guard: stopped early
-
-              APP.activeNotes.add(note);
-
-              // Flip mode: toggle horizontal flip on each new MIDI trigger
-              if (APP.isFlipMode && APP.mediaType === 'video') {
-                APP.flipState *= -1;
-                EL.video.style.transform = `scaleX(${APP.flipState})`;
-              }
-
-              // Remove active highlight after note ends
-              setTimeout(() => {
-                APP.activeNotes.delete(note);
-              }, (note.duration + 0.15) * 1000);
-
-            }, msDelay);
-
-          }, note.time); // Tone.Transport offset in seconds
-        }
-
-        // Auto-stop when MIDI finishes
-        Tone.Transport.schedule(() => {
-          setTimeout(() => {
-            if (APP.isPlaying) stopPlayback();
-          }, 600);
-        }, APP.totalDuration + 0.3);
-      }
-
-      // ================================================
-      // PLAYBACK CONTROL
-      // ================================================
-      async function startPlayback() {
-        if (!APP.midiData || !APP.audioBuffer) return;
-
-        // Ensure AudioContext is resumed (browsers suspend it by default)
-        await Tone.start();
-
-        // Reset transport
-        Tone.Transport.stop();
-        Tone.Transport.cancel();
-        Tone.Transport.seconds = 0;
-
-        // Reset visual/state
-        APP.activeNotes.clear();
-        APP.flipState = 1;
-        EL.video.style.transform = 'scaleX(1)';
-
-        // Schedule all notes
-        scheduleAllNotes();
-
-        // Small lead time (seconds) lets the audio engine warm up and reduces
-        // the chance of the first note glitching
-        const leadTime = 0.15;
-        Tone.Transport.start(`+${leadTime}`);
-
-        // Sync video: start it at the same wall-clock moment as the transport
-        if (APP.mediaType === 'video') {
-          EL.video.currentTime = 0;
-          setTimeout(() => {
-            EL.video.play().catch(console.error);
-          }, leadTime * 1000);
-        }
-
-        APP.isPlaying = true;
-        EL.playBtn.classList.add('playing');
-        $('playIcon').textContent  = '⏹';
-        $('playLabel').textContent = '정지';
-        EL.timeDisp.classList.add('playing');
-
-        startAnimationLoop();
-      }
-
-      function stopPlayback() {
-        Tone.Transport.stop();
-        Tone.Transport.cancel();
-
-        if (APP.mediaType === 'video') {
-          EL.video.pause();
-          EL.video.currentTime = 0;
-        }
-
-        // Silence master gain immediately
-        if (APP.masterGain) {
-          try {
-            APP.masterGain.gain.setTargetAtTime(0, Tone.context.rawContext.currentTime, 0.02);
-          } catch (_) {}
-        }
-
-        APP.activeNotes.clear();
-        APP.isPlaying  = false;
-        APP.flipState  = 1;
-        EL.video.style.transform = 'scaleX(1)';
-
-        EL.playBtn.classList.remove('playing');
-        $('playIcon').textContent  = '▶';
-        $('playLabel').textContent = '재생';
-        EL.timeDisp.classList.remove('playing');
-        EL.timeDisp.textContent = '00:00';
-
-        if (APP.animFrameId) {
-          cancelAnimationFrame(APP.animFrameId);
-          APP.animFrameId = null;
-        }
-
-        // Redraw piano roll without playhead
-        drawPianoRoll(0);
-      }
-
-      function togglePlayback() {
-        if (APP.isPlaying) {
-          stopPlayback();
-        } else {
-          startPlayback();
-        }
-      }
-
-      // ================================================
-      // ANIMATION LOOP (requestAnimationFrame)
-      // ================================================
-      function startAnimationLoop() {
-        if (APP.animFrameId) cancelAnimationFrame(APP.animFrameId);
-
-        function loop() {
-          if (!APP.isPlaying) return;
-
-          const t = Tone.Transport.seconds;
-          drawPianoRoll(t);
-          EL.timeDisp.textContent = formatTime(t) + ' / ' + formatTime(APP.totalDuration);
-
-          APP.animFrameId = requestAnimationFrame(loop);
-        }
-
-        APP.animFrameId = requestAnimationFrame(loop);
-      }
-
-      // ================================================
-      // FLIP MODE TOGGLE
-      // ================================================
-      EL.flipBtn.addEventListener('click', () => {
-        APP.isFlipMode = !APP.isFlipMode;
-
+    }
+
+    // ================================================
+    // TRIGGER BEHAVIOR (Core Logic)
+    // ================================================
+    function executeTrigger(time) {
+      Tone.Draw.schedule(() => {
+        // 1. 영상 무조건 0초로 리셋 (딱딱 끊기는 효과의 핵심)
+        EL.video.currentTime = 0;
+        
+        // 2. 좌우 반전 로직 (반전 애니메이션 제거됨)
         if (APP.isFlipMode) {
-          $('flipLabel').textContent = '플립 모드: 켜짐';
-          EL.flipBtn.classList.add('active');
+          APP.currentFlip = APP.currentFlip === 1 ? -1 : 1;
+          EL.video.style.transform = `scaleX(${APP.currentFlip})`;
         } else {
-          $('flipLabel').textContent = '플립 모드: 꺼짐';
-          EL.flipBtn.classList.remove('active');
-          // Reset flip
-          APP.flipState = 1;
-          EL.video.style.transform = 'scaleX(1)';
+          APP.currentFlip = 1;
+          EL.video.style.transform = `scaleX(1)`;
         }
+
+        // 3. UI 인디케이터 연동 (상태 표시 점 깜빡임)
+        EL.statusDot.classList.add('trigger');
+        setTimeout(() => {
+          EL.statusDot.classList.remove('trigger');
+        }, 50); // 50ms 후 원래 색상(초록색)으로 복구
+
+      }, time);
+    }
+
+    async function setupPlayback() {
+      Tone.Transport.cancel();
+      APP.synths.forEach(s => s.dispose());
+      APP.synths = [];
+
+      APP.midi.tracks.forEach(track => {
+        const synth = new Tone.PolySynth(Tone.Synth).toDestination();
+        APP.synths.push(synth);
+        track.notes.forEach(note => {
+          Tone.Transport.schedule((time) => {
+            synth.triggerAttackRelease(note.name, note.duration, time, note.velocity);
+            executeTrigger(time);
+          }, note.time);
+        });
       });
+    }
 
-      // ================================================
-      // EVENT WIRING
-      // ================================================
-      EL.playBtn.addEventListener('click', togglePlayback);
-
-      setupDropZone(EL.midiZone,   EL.midiInput,   handleMidiFile);
-      setupDropZone(EL.mediaZone,  EL.mediaInput,  handleMediaFile);
-
-      // ================================================
-      // INIT
-      // ================================================
-      function init() {
-        resizeCanvas();
-        drawPianoRoll(0);       // Draw placeholder canvas
-        setStatus('MIDI 파일과 미디어 파일을 업로드하면 재생이 가능합니다');
+    EL.playBtn.addEventListener('click', async () => {
+      if (APP.isPlaying) {
+        Tone.Transport.stop();
+        EL.video.pause();
+        APP.isPlaying = false;
+        EL.playBtn.textContent = '재생 버튼';
+        setStatus('정지됨');
+      } else {
+        await Tone.start();
+        await setupPlayback();
+        Tone.Transport.start();
+        EL.video.play();
+        APP.isPlaying = true;
+        EL.playBtn.textContent = '일시 정지';
+        setStatus('재생 중', true);
       }
-
-      window.addEventListener('resize', () => {
-        resizeCanvas();
-        drawPianoRoll(APP.isPlaying ? Tone.Transport.seconds : 0);
-      });
-
-      init();
     });
+
+    EL.flipBtn.addEventListener('click', () => {
+      APP.isFlipMode = !APP.isFlipMode;
+      EL.flipBtn.classList.toggle('active', APP.isFlipMode);
+      if (!APP.isFlipMode) {
+        APP.currentFlip = 1;
+        EL.video.style.transform = 'scaleX(1)';
+      }
+    });
+
+    // File input handlers
+    const setupZone = (zone, input, handler) => {
+      zone.addEventListener('click', () => input.click());
+      zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.style.borderColor = 'var(--accent)'; });
+      zone.addEventListener('dragleave', () => { zone.style.borderColor = ''; });
+      zone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        zone.style.borderColor = '';
+        handler(e.dataTransfer.파일[0]);
+      });
+      input.addEventListener('change', (e) => handler(e.target.파일[0]));
+    };
+
+    setupZone(EL.midiZone, EL.midiInput, handleMidi);
+    setupZone(EL.mediaZone, EL.mediaInput, handleMedia);
+
+    function resizeCanvas() {
+      EL.canvas.width = EL.canvas.parentElement.clientWidth;
+      EL.canvas.height = EL.canvas.parentElement.clientHeight;
+    }
+
+    function render() {
+      if (APP.isPlaying && APP.midi) {
+        const time = Tone.Transport.seconds;
+        EL.ctx.clearRect(0, 0, EL.canvas.width, EL.canvas.height);
+        
+        // Center Line
+        EL.ctx.strokeStyle = 'rgba(108, 77, 246, 0.5)';
+        EL.ctx.beginPath();
+        EL.ctx.moveTo(EL.canvas.width / 2, 0);
+        EL.ctx.lineTo(EL.canvas.width / 2, EL.canvas.height);
+        EL.ctx.stroke();
+
+        APP.midi.tracks.forEach(track => {
+          track.notes.forEach(note => {
+            const x = (note.time - time) * 150 + (EL.canvas.width / 2);
+            const y = EL.canvas.height - (note.midi % 24) * (EL.canvas.height / 24);
+            const w = note.duration * 150;
+            if (x + w > 0 && x < EL.canvas.width) {
+              EL.ctx.fillStyle = note.time <= time && note.time + note.duration >= time ? 'var(--accent2)' : 'var(--accent)';
+              EL.ctx.fillRect(x, y, w, 4);
+            }
+          });
+        });
+      }
+      requestAnimationFrame(render);
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+    render();
   </script>
 </body>
 </html>
