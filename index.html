@@ -317,16 +317,16 @@
         Tone.Transport.stop();
         EL.video.pause();
         APP.isPlaying = false;
-        EL.playBtn.textContent = '재생 버튼';
-        setStatus('일시 정지됨', true);
+        EL.playBtn.textContent = '■정지';
+        setStatus('여기를 눌러 재생', true);
       } else {
         await Tone.start();
         await setupPlayback();
         Tone.Transport.start();
         EL.video.play().catch(e => {});
         APP.isPlaying = true;
-        EL.playBtn.textContent = '일시 정지';
-        setStatus('샘플러 연주 중...', true);
+        EL.playBtn.textContent = '정지 상태';
+        setStatus('연주 중...', true);
       }
     });
 
