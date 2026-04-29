@@ -317,7 +317,7 @@
         Tone.Transport.stop();
         EL.video.pause();
         APP.isPlaying = false;
-        EL.playBtn.textContent = '■정지';
+        EL.playBtn.textContent = '재생';
         setStatus('여기를 눌러 재생', true);
       } else {
         await Tone.start();
@@ -325,7 +325,7 @@
         Tone.Transport.start();
         EL.video.play().catch(e => {});
         APP.isPlaying = true;
-        EL.playBtn.textContent = '정지 상태';
+        EL.playBtn.textContent = '정지';
         setStatus('연주 중...', true);
       }
     });
