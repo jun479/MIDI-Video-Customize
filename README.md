@@ -20,7 +20,7 @@ MIDI 파싱 + 피아노롤 표시
 
 *비디오/오디오 내보내기 기능(추가 예정)*
 
-*영상 제어 추가 (상하 반전)*
+*영상 제어 추가 상하 반전(추가 예정)*
 
 ## 👉미디 사이트 추천
 | https://bitmidi.com | https://basicpitch.spotify.com | https://eldoraudio.com |
