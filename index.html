@@ -38,12 +38,41 @@
     }
 
     header {
-      padding: 1.25rem 2rem;
+      padding: 0.75rem 1.5rem; /* 헤더 높이 최소화 */
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: linear-gradient(to bottom, rgba(5,5,13,0.9), transparent);
+      background: rgba(5, 5, 13, 0.9);
+      border-bottom: 1px solid var(--border);
       z-index: 100;
+      gap: 1.5rem;
+      min-height: 64px; /* 기존 헤더 사이즈 유지용 */
+    }
+
+    .title-area {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex: 1;
+    }
+
+    .main-title {
+      font-size: 1.4rem; /* 타이틀 크기 축소 */
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      white-space: nowrap;
+      margin: 0;
+    }
+
+    .description-text {
+      font-size: 0.7rem; /* 더 작게 조정 */
+      line-height: 1.3;
+      color: var(--text2);
+      word-break: keep-all;
+      max-width: 500px;
+      border-left: 1px solid var(--border2);
+      padding-left: 1.2rem;
+      opacity: 0.8;
     }
 
     .header-controls {
@@ -71,7 +100,6 @@
       border-color: var(--accent);
       background: var(--surface3);
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(108, 77, 246, 0.2);
     }
 
     .github-link svg { width: 20px; height: 20px; fill: currentColor; }
@@ -85,12 +113,12 @@
       color: var(--text2);
       display: flex;
       align-items: center;
-      gap: 0.6rem;
+      gap: 0.5rem;
+      white-space: nowrap;
     }
     
     .status-dot { 
-      width: 10px; height: 10px; border-radius: 50%; background: #2a2a5a; 
-      transition: background 0.05s, box-shadow 0.05s;
+      width: 8px; height: 8px; border-radius: 50%; background: #2a2a5a; 
     }
     .status-dot.active { background: var(--green); box-shadow: 0 0 10px var(--green); }
     .status-dot.trigger { background: var(--accent2) !important; box-shadow: 0 0 15px var(--accent2) !important; }
@@ -100,7 +128,7 @@
       display: grid;
       grid-template-columns: 1fr 320px;
       gap: 1rem;
-      padding: 0 1rem 1rem 1rem;
+      padding: 1rem;
       position: relative;
       overflow: hidden;
     }
@@ -125,7 +153,6 @@
       align-items: center;
       justify-content: center;
       position: relative;
-      transition: background-color 0.2s ease;
     }
 
     #main-video {
@@ -193,7 +220,7 @@
     .drop-zone {
       border: 2px dashed var(--border2);
       border-radius: 8px;
-      padding: 1.25rem;
+      padding: 1rem;
       text-align: center;
       transition: all 0.2s;
       cursor: pointer;
@@ -201,29 +228,29 @@
       display: block;
     }
     .drop-zone:hover, .drop-zone.dragover { border-color: var(--accent); background: var(--surface2); }
-    .drop-zone p { font-size: 0.75rem; color: var(--text2); pointer-events: none; }
+    .drop-zone p { font-size: 0.7rem; color: var(--text2); pointer-events: none; }
     .drop-zone.loaded { border-style: solid; border-color: var(--green); background: rgba(0, 232, 143, 0.05); }
 
-    .control-group { margin-bottom: 1rem; }
-    .control-label { display: block; font-size: 0.75rem; color: var(--text2); margin-bottom: 0.5rem; }
+    .control-group { margin-bottom: 0.8rem; }
+    .control-label { display: block; font-size: 0.75rem; color: var(--text2); margin-bottom: 0.4rem; }
     
     select, input[type="text"] {
       width: 100%;
       background: var(--surface2);
       border: 1px solid var(--border);
       border-radius: 6px;
-      padding: 0.6rem;
+      padding: 0.5rem;
       color: var(--text);
       font-family: inherit;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       outline: none;
     }
-    select:focus, input[type="text"]:focus { border-color: var(--accent); }
 
     .btn {
-      width: 100%; padding: 0.75rem; border-radius: 8px; border: none;
+      width: 100%; padding: 0.7rem; border-radius: 8px; border: none;
       font-family: inherit; font-weight: 600; cursor: pointer;
       transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+      font-size: 0.85rem;
     }
     .btn-primary { background: var(--accent); color: white; }
     .btn-primary:disabled { background: var(--surface3); color: var(--text3); cursor: not-allowed; }
@@ -233,7 +260,6 @@
     .btn-export { background: #8a70ff; color: white; margin-top: 0.75rem; }
     .btn-export:disabled { opacity: 0.7; cursor: wait; }
 
-    .export-container { margin-top: 0.75rem; }
     .progress-bg { width: 100%; height: 6px; background: var(--surface3); border-radius: 3px; overflow: hidden; display: none; margin-bottom: 8px; }
     #export-progress { width: 0%; height: 100%; background: var(--green); transition: width 0.1s linear; }
 
@@ -243,14 +269,20 @@
 <body>
 
   <header>
-    <h1 style="font-size: 1.1rem; font-weight: 700; letter-spacing: -0.5px;">MIDI Video <span style="color: var(--accent);">Freeloading</span></h1>
+    <div class="title-area">
+      <h1 class="main-title">MIDI Video <span style="color: var(--accent);">Freeloading</span></h1>
+      <p class="description-text">
+        사용자가 업로드한 MIDI, 오디오, 비디오 파일은 서버로 전송되지 않으며 브라우저에서만 처리됩니다.<br>
+        결과물은 자유롭게 사용 가능하며 출처 표기는 불필요하나, 업로드한 원본 파일의 저작권 및 사용 책임은 사용자에게 있습니다.
+      </p>
+    </div>
     <div class="header-controls">
-      <a href="https://github.com/jun479/MIDI-Video-Customize" target="_blank" class="github-link" title="사용 설명서 및 깃허브 (프로그램 소개, 사용 방법, 코드 공개)">
+      <a href="https://github.com/jun479/MIDI-Video-Customize" target="_blank" class="github-link" title="사용 설명서 및 깃허브">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"></path></svg>
       </a>
       <div class="status-badge">
         <div id="status-dot" class="status-dot"></div>
-        <span id="status-text">파일을 업로드 해주세요</span>
+        <span id="status-text">파일 업로드 대기</span>
       </div>
     </div>
   </header>
@@ -266,12 +298,12 @@
       <div class="card">
         <div class="card-title">File Upload</div>
         <label for="midi-input" class="drop-zone" id="midi-zone">
-          <p id="midi-label">MIDI 파일을 드롭하거나 클릭하세요</p>
+          <p id="midi-label">MIDI 드롭/클릭</p>
         </label>
         <input type="file" id="midi-input" accept=".mid,.midi">
 
         <label for="media-input" class="drop-zone" id="media-zone">
-          <p id="media-label">비디오/오디오 파일을 드롭하거나 클릭하세요</p>
+          <p id="media-label">미디어 드롭/클릭</p>
         </label>
         <input type="file" id="media-input" accept="video/*,audio/*">
       </div>
@@ -296,17 +328,15 @@
         </div>
 
         <div class="control-group">
-          <label class="control-label">배경 헥스 코드 (#RRGGBB)</label>
+          <label class="control-label">배경 헥스 코드</label>
           <input type="text" id="hex-bg-input" placeholder="#000000" value="#000000">
         </div>
 
-        <div style="height: 0.5rem;"></div>
-        
         <button id="play-btn" class="btn btn-primary" disabled>재생</button>
-        <div style="height: 0.75rem;"></div>
-        <button id="flip-h-btn" class="btn btn-secondary">좌우 반전 모드 토글</button>
         <div style="height: 0.5rem;"></div>
-        <button id="flip-v-btn" class="btn btn-secondary">상하 반전 모드 토글(*실험적*)</button>
+        <button id="flip-h-btn" class="btn btn-secondary">좌우 반전</button>
+        <div style="height: 0.4rem;"></div>
+        <button id="flip-v-btn" class="btn btn-secondary">상하 반전</button>
       </div>
 
       <div class="card piano-roll-card">
@@ -316,7 +346,7 @@
         </div>
         <div class="export-container">
           <div class="progress-bg" id="progress-bg"><div id="export-progress"></div></div>
-          <button id="export-audio-btn" class="btn btn-export" disabled>WAV 오디오 추출</button>
+          <button id="export-audio-btn" class="btn btn-export" disabled>WAV 추출</button>
         </div>
       </div>
     </div>
@@ -329,40 +359,23 @@
     const $ = id => document.getElementById(id);
     
     const APP = {
-      midi: null, 
-      sampler: null, 
-      isPlaying: false, 
-      isFlipHMode: false,
-      isFlipVMode: false,
-      currentFlipX: 1,
-      currentFlipY: 1,
-      midiLoaded: false, 
-      mediaLoaded: false,
-      activeNotes: new Set(),
-      currentMediaUrl: null
+      midi: null, sampler: null, isPlaying: false, 
+      isFlipHMode: false, isFlipVMode: false,
+      currentFlipX: 1, currentFlipY: 1,
+      midiLoaded: false, mediaLoaded: false,
+      activeNotes: new Set(), currentMediaUrl: null
     };
 
     const EL = {
-      video: $('main-video'),
-      vidBg: $('vid-bg'),
-      viewport: $('viewport'),
-      canvas: $('piano-roll'),
-      ctx: $('piano-roll').getContext('2d'),
-      playBtn: $('play-btn'),
-      flipHBtn: $('flip-h-btn'),
-      flipVBtn: $('flip-v-btn'),
-      midiZone: $('midi-zone'),
-      mediaZone: $('media-zone'),
-      midiInput: $('midi-input'),
-      mediaInput: $('media-input'),
-      statusText: $('status-text'),
-      statusDot: $('status-dot'),
-      inAnim: $('in-anim-select'),
-      outAnim: $('out-anim-select'),
-      hexBg: $('hex-bg-input'),
-      exportBtn: $('export-audio-btn'),
-      progressBg: $('progress-bg'),
-      progressFill: $('export-progress')
+      video: $('main-video'), vidBg: $('vid-bg'), viewport: $('viewport'),
+      canvas: $('piano-roll'), ctx: $('piano-roll').getContext('2d'),
+      playBtn: $('play-btn'), flipHBtn: $('flip-h-btn'), flipVBtn: $('flip-v-btn'),
+      midiZone: $('midi-zone'), mediaZone: $('media-zone'),
+      midiInput: $('midi-input'), mediaInput: $('media-input'),
+      statusText: $('status-text'), statusDot: $('status-dot'),
+      inAnim: $('in-anim-select'), outAnim: $('out-anim-select'),
+      hexBg: $('hex-bg-input'), exportBtn: $('export-audio-btn'),
+      progressBg: $('progress-bg'), progressFill: $('export-progress')
     };
 
     function setStatus(msg, active = false) {
@@ -385,12 +398,10 @@
         const arrayBuffer = await file.arrayBuffer();
         APP.midi = new Midi(arrayBuffer);
         APP.midiLoaded = true;
-        $('midi-label').textContent = `✓ MIDI: ${file.name}`;
+        $('midi-label').textContent = `✓ MIDI: ${file.name.substring(0, 10)}...`;
         EL.midiZone.classList.add('loaded');
         checkReady();
-      } catch (e) {
-        setStatus('MIDI 파일 형식 오류');
-      }
+      } catch (e) { setStatus('MIDI 오류'); }
     }
 
     async function handleMedia(file) {
@@ -407,21 +418,19 @@
           urls: { C4: url },
           onload: () => {
             APP.mediaLoaded = true;
-            $('media-label').textContent = `✓ 샘플 로드 완료: ${file.name}`;
+            $('media-label').textContent = `✓ 미디어 완료`;
             EL.mediaZone.classList.add('loaded');
             checkReady();
           }
         }).toDestination();
-      } catch (e) {
-        setStatus('미디어 파일 처리 오류');
-      }
+      } catch (e) { setStatus('미디어 오류'); }
     }
 
     function checkReady() {
       if (APP.midiLoaded && APP.mediaLoaded) {
         EL.playBtn.disabled = false;
         EL.exportBtn.disabled = false;
-        setStatus('준비 완료! 퍼포먼스 대기 중');
+        setStatus('Ready!', true);
       }
     }
 
@@ -435,46 +444,28 @@
       Tone.Transport.schedule((t) => {
         Tone.Draw.schedule(() => {
           APP.activeNotes.add(note.midi);
-          
           EL.video.currentTime = 0;
           EL.video.play().catch(() => {});
           EL.video.style.opacity = "1";
-
-          if (APP.isFlipHMode) {
-            APP.currentFlipX = (APP.currentFlipX === 1) ? -1 : 1;
-          } else {
-            APP.currentFlipX = 1;
-          }
-
-          if (APP.isFlipVMode) {
-            APP.currentFlipY = (APP.currentFlipY === 1) ? -1 : 1;
-          } else {
-            APP.currentFlipY = 1;
-          }
-          
+          if (APP.isFlipHMode) APP.currentFlipX = (APP.currentFlipX === 1) ? -1 : 1;
+          if (APP.isFlipVMode) APP.currentFlipY = (APP.currentFlipY === 1) ? -1 : 1;
           applyTransform();
-
           if (EL.inAnim.value === 'pop') {
             EL.video.classList.remove('anim-pop');
             void EL.video.offsetWidth; 
             EL.video.classList.add('anim-pop');
           }
-
           EL.statusDot.classList.add('trigger');
           setTimeout(() => EL.statusDot.classList.remove('trigger'), 50);
         }, t);
-
         if (APP.sampler) APP.sampler.triggerAttack(note.name, t);
       }, note.time);
 
       Tone.Transport.schedule((t) => {
         Tone.Draw.schedule(() => {
           APP.activeNotes.delete(note.midi);
-          
-          if (APP.isPlaying && APP.activeNotes.size === 0) {
-            if (EL.outAnim.value === 'fade') {
-              EL.video.style.opacity = "0";
-            }
+          if (APP.isPlaying && APP.activeNotes.size === 0 && EL.outAnim.value === 'fade') {
+            EL.video.style.opacity = "0";
           }
         }, t);
         if (APP.sampler) APP.sampler.triggerRelease(note.name, t);
@@ -485,140 +476,75 @@
       Tone.Transport.cancel();
       APP.activeNotes.clear();
       APP.midi.tracks.forEach(track => {
-        track.notes.forEach(note => {
-          executeTrigger(note.time, note);
-        });
+        track.notes.forEach(note => { executeTrigger(note.time, note); });
       });
     }
 
-    EL.playBtn.addEventListener('click', async () => {
+    EL.playBtn.onclick = async () => {
       if (APP.isPlaying) {
         Tone.Transport.stop();
         EL.video.pause();
-        EL.video.style.opacity = "1"; 
         APP.isPlaying = false;
         EL.playBtn.textContent = '재생';
-        setStatus('일시 정지됨', true);
       } else {
         await Tone.start();
         await setupPlayback();
         Tone.Transport.start();
         APP.isPlaying = true;
         EL.playBtn.textContent = '정지';
-        setStatus('라이브 퍼포먼스 중...', true);
-      }
-    });
-
-    EL.flipHBtn.addEventListener('click', () => {
-      APP.isFlipHMode = !APP.isFlipHMode;
-      EL.flipHBtn.classList.toggle('active', APP.isFlipHMode);
-      if (!APP.isFlipHMode) {
-        APP.currentFlipX = 1;
-        applyTransform();
-      }
-    });
-
-    EL.flipVBtn.addEventListener('click', () => {
-      APP.isFlipVMode = !APP.isFlipVMode;
-      EL.flipVBtn.classList.toggle('active', APP.isFlipVMode);
-      if (!APP.isFlipVMode) {
-        APP.currentFlipY = 1;
-        applyTransform();
-      }
-    });
-
-    // --- Audio Export Logic (WAV) with Progress ---
-    EL.exportBtn.onclick = async () => {
-      if (!APP.midi || !APP.currentMediaUrl) return;
-      
-      EL.exportBtn.disabled = true;
-      EL.progressBg.style.display = 'block';
-      EL.progressFill.style.width = '0%';
-      EL.exportBtn.textContent = '추출 중... (0%)';
-      setStatus('오디오 렌더링 중...', true);
-
-      const duration = APP.midi.duration + 2; 
-      
-      try {
-        const buffer = await Tone.Offline(async (context) => {
-          const offlineSampler = new Tone.Sampler({
-            urls: { C4: APP.currentMediaUrl }
-          }).toDestination();
-          
-          await Tone.loaded();
-          
-          APP.midi.tracks.forEach(track => {
-            track.notes.forEach(note => {
-              offlineSampler.triggerAttackRelease(note.name, note.duration, note.time);
-            });
-          });
-
-          // 진행률 추적을 위한 루프 (Tone.Offline 내에서 직접 진행 상황을 업데이트할 방법이 제한적이므로 context의 시간을 활용)
-          // 하지만 Tone.Offline은 비동기 렌더링이므로 콜백으로 진행률을 받는 것이 더 정확함.
-        }, duration, (progress) => {
-          // Tone.Offline의 세 번째 인자는 진행률 콜백 (0~1)
-          const percent = Math.round(progress * 100);
-          EL.progressFill.style.width = `${percent}%`;
-          EL.exportBtn.textContent = `추출 중... (${percent}%)`;
-        });
-
-        EL.progressFill.style.width = '100%';
-        EL.exportBtn.textContent = '인코딩 중...';
-
-        const wavBlob = audioBufferToWav(buffer);
-        const url = URL.createObjectURL(wavBlob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `MIDI_Video_Freeloading_${Date.now()}.wav`;
-        a.click();
-        
-        setStatus('추출 완료! 파일 저장됨', true);
-        EL.exportBtn.textContent = '추출 완료!';
-      } catch (err) {
-        console.error(err);
-        setStatus('추출 중 오류 발생');
-        EL.exportBtn.textContent = '추출 실패';
-      } finally {
-        setTimeout(() => {
-          EL.exportBtn.disabled = false;
-          EL.exportBtn.textContent = 'WAV 오디오 추출';
-          EL.progressBg.style.display = 'none';
-        }, 3000);
       }
     };
 
+    EL.flipHBtn.onclick = () => {
+      APP.isFlipHMode = !APP.isFlipHMode;
+      EL.flipHBtn.classList.toggle('active', APP.isFlipHMode);
+      if (!APP.isFlipHMode) { APP.currentFlipX = 1; applyTransform(); }
+    };
+
+    EL.flipVBtn.onclick = () => {
+      APP.isFlipVMode = !APP.isFlipVMode;
+      EL.flipVBtn.classList.toggle('active', APP.isFlipVMode);
+      if (!APP.isFlipVMode) { APP.currentFlipY = 1; applyTransform(); }
+    };
+
+    EL.exportBtn.onclick = async () => {
+      if (!APP.midi || !APP.currentMediaUrl) return;
+      EL.exportBtn.disabled = true;
+      EL.progressBg.style.display = 'block';
+      const duration = APP.midi.duration + 2; 
+      try {
+        const buffer = await Tone.Offline(async (context) => {
+          const offlineSampler = new Tone.Sampler({ urls: { C4: APP.currentMediaUrl } }).toDestination();
+          await Tone.loaded();
+          APP.midi.tracks.forEach(track => {
+            track.notes.forEach(note => { offlineSampler.triggerAttackRelease(note.name, note.duration, note.time); });
+          });
+        }, duration, (p) => {
+          EL.progressFill.style.width = `${p * 100}%`;
+        });
+        const wavBlob = audioBufferToWav(buffer);
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(wavBlob);
+        a.download = `MIDI_Export.wav`;
+        a.click();
+      } catch (err) {}
+      finally { setTimeout(() => { EL.exportBtn.disabled = false; EL.progressBg.style.display = 'none'; }, 2000); }
+    };
+
     function audioBufferToWav(buffer) {
-      const numOfChan = buffer.numberOfChannels;
-      const length = buffer.length * numOfChan * 2 + 44;
-      const bufferOut = new ArrayBuffer(length);
-      const view = new DataView(bufferOut);
-      const channels = [];
-      let i, sample, offset = 0, pos = 0;
-
-      const setUint16 = (data) => { view.setUint16(pos, data, true); pos += 2; };
-      const setUint32 = (data) => { view.setUint32(pos, data, true); pos += 4; };
-
-      setUint32(0x46464952); // "RIFF"
-      setUint32(length - 8); 
-      setUint32(0x45564157); // "WAVE"
-      setUint32(0x20746d66); // "fmt "
-      setUint32(16); 
-      setUint16(1); 
-      setUint16(numOfChan);
-      setUint32(buffer.sampleRate);
-      setUint32(buffer.sampleRate * 2 * numOfChan);
-      setUint16(numOfChan * 2);
-      setUint16(16);
-      setUint32(0x61746164); // "data"
-      setUint32(length - pos - 4);
-
+      const numOfChan = buffer.numberOfChannels, length = buffer.length * numOfChan * 2 + 44;
+      const bufferOut = new ArrayBuffer(length), view = new DataView(bufferOut);
+      const channels = []; let i, sample, offset = 0, pos = 0;
+      const setUint16 = d => { view.setUint16(pos, d, true); pos += 2; };
+      const setUint32 = d => { view.setUint32(pos, d, true); pos += 4; };
+      setUint32(0x46464952); setUint32(length - 8); setUint32(0x45564157); setUint32(0x20746d66); setUint32(16); setUint16(1); setUint16(numOfChan);
+      setUint32(buffer.sampleRate); setUint32(buffer.sampleRate * 2 * numOfChan); setUint16(numOfChan * 2); setUint16(16); setUint32(0x61746164); setUint32(length - pos - 4);
       for (i = 0; i < buffer.numberOfChannels; i++) channels.push(buffer.getChannelData(i));
       while (pos < length) {
         for (i = 0; i < numOfChan; i++) {
           sample = Math.max(-1, Math.min(1, channels[i][offset]));
           sample = (sample < 0 ? sample * 0x8000 : sample * 0x7FFF) | 0;
-          view.setInt16(pos, sample, true);
-          pos += 2;
+          view.setInt16(pos, sample, true); pos += 2;
         }
         offset++;
       }
@@ -626,16 +552,10 @@
     }
 
     const initDropZone = (zone, input, handler) => {
-      zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('dragover'); });
-      zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
-      zone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        zone.classList.remove('dragover');
-        if (e.dataTransfer.files.length) handler(e.dataTransfer.files[0]);
-      });
-      input.addEventListener('change', (e) => {
-        if (e.target.files.length) handler(e.target.files[0]);
-      });
+      zone.ondragover = e => { e.preventDefault(); zone.classList.add('dragover'); };
+      zone.ondragleave = () => zone.classList.remove('dragover');
+      zone.ondrop = e => { e.preventDefault(); zone.classList.remove('dragover'); if (e.dataTransfer.files.length) handler(e.dataTransfer.files[0]); };
+      input.onchange = e => { if (e.target.files.length) handler(e.target.files[0]); };
     };
 
     initDropZone(EL.midiZone, EL.midiInput, handleMidi);
@@ -651,21 +571,14 @@
       if (APP.isPlaying && APP.midi) {
         const time = Tone.Transport.seconds;
         EL.ctx.clearRect(0, 0, EL.canvas.width, EL.canvas.height);
-        
         EL.ctx.strokeStyle = 'rgba(108, 77, 246, 0.3)';
         EL.ctx.lineWidth = 1;
-        EL.ctx.beginPath();
-        EL.ctx.moveTo(EL.canvas.width / 4, 0);
-        EL.ctx.lineTo(EL.canvas.width / 4, EL.canvas.height);
-        EL.ctx.stroke();
-
+        EL.ctx.beginPath(); EL.ctx.moveTo(EL.canvas.width / 4, 0); EL.ctx.lineTo(EL.canvas.width / 4, EL.canvas.height); EL.ctx.stroke();
         APP.midi.tracks.forEach(track => {
           track.notes.forEach(note => {
             const x = (note.time - time) * 100 + (EL.canvas.width / 4);
             const y = EL.canvas.height - (note.midi % 48) * (EL.canvas.height / 48);
-            const w = note.duration * 100;
-            
-            if (x + w > 0 && x < EL.canvas.width) {
+            if (x + 30 > 0 && x < EL.canvas.width) {
               EL.ctx.fillStyle = note.time <= time && note.time + note.duration >= time ? 'var(--accent2)' : '#FFFFFF';
               EL.ctx.fillRect(x, y, 30, 4);
             }
@@ -675,7 +588,7 @@
       requestAnimationFrame(render);
     }
 
-    window.addEventListener('resize', resizeCanvas);
+    window.onresize = resizeCanvas;
     setTimeout(resizeCanvas, 100);
     render();
   </script>
