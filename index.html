@@ -65,46 +65,66 @@
 
     /* --- 공지사항 섹션 --- */
     .notice-section {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
       font-size: 0.8rem;
       color: var(--text2);
       white-space: nowrap;
+    }
+
+    .notice-text {
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .pc-notice { display: block; }
-    .mobile-notice { display: none; }
+    /* 공통 공지사항 상세 스타일 */
+    .notice-detail {
+      position: relative;
+    }
 
-    @media (max-width: 1024px) {
-      .pc-notice { display: none; }
-      .mobile-notice { display: block; }
-      
-      .mobile-notice summary {
-        font-size: 0.7rem;
-        color: var(--accent-glow);
-        cursor: pointer;
-        list-style: none;
-        padding: 4px 8px;
-        background: var(--surface2);
-        border-radius: 4px;
-      }
-      .mobile-notice summary::-webkit-details-marker { display: none; }
-      
-      .mobile-content {
-        position: absolute;
-        top: 60px;
-        left: 1.5rem;
-        right: 1.5rem;
-        background: var(--surface3);
-        padding: 1rem;
-        border-radius: 8px;
-        border: 1px solid var(--accent);
-        white-space: normal;
-        z-index: 200;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        font-size: 0.75rem;
-        color: #ddd;
-        line-height: 1.5;
+    .notice-detail summary {
+      font-size: 0.7rem;
+      color: var(--accent-glow);
+      cursor: pointer;
+      list-style: none;
+      padding: 4px 10px;
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    .notice-detail summary:hover {
+      background: var(--surface3);
+      border-color: var(--accent);
+    }
+    .notice-detail summary::-webkit-details-marker { display: none; }
+    
+    .notice-content {
+      position: absolute;
+      top: 35px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 280px;
+      background: var(--surface3);
+      padding: 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--accent);
+      white-space: normal;
+      z-index: 200;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      font-size: 0.75rem;
+      color: #ddd;
+      line-height: 1.5;
+    }
+
+    /* 모바일에서는 텍스트 숨기고 버튼만 강조 */
+    @media (max-width: 768px) {
+      .notice-text { display: none; }
+      .notice-content {
+        left: auto;
+        right: -50px;
+        transform: none;
       }
     }
 
@@ -232,15 +252,12 @@
       <h1 class="main-title">MIDI Video <span style="color: var(--accent);">Freeloading</span></h1>
       
       <div class="notice-section">
-        <!-- PC: 타이틀 옆에 바로 노출 -->
-        <div class="pc-notice">
-          출처 표기 불필요 · 원본 저작권 책임은 사용자에게 있음
-        </div>
+        <span class="notice-text">출처 표기 불필요 · 원본 저작권 책임은 사용자에게 있음</span>
         
-        <!-- 모바일: 버튼형태 -->
-        <details class="mobile-notice">
+        <!-- PC/모바일 통합 상세 버튼 -->
+        <details class="notice-detail">
           <summary>자세히 보기</summary>
-          <div class="mobile-content">
+          <div class="notice-content">
             본 사이트를 통해 생성된 결과물은 자유롭게 사용 가능하며 출처 표기는 불필요합니다. 
             단, 업로드한 파일의 저작권 및 사용 책임은 전적으로 사용자에게 있습니다. 
             모든 처리는 브라우저에서 이루어지며 파일은 서버로 전송되지 않습니다.
