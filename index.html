@@ -109,7 +109,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #000;
+      background: #000; /* 이 부분이 컨테이너 배경을 가릴 수 있음 */
       border-radius: var(--radius);
       border: 1px solid var(--border);
       overflow: hidden;
@@ -125,7 +125,7 @@
       align-items: center;
       justify-content: center;
       position: relative;
-      transition: background-color 0.3s;
+      transition: background-color 0.2s ease;
     }
 
     #main-video {
@@ -133,8 +133,9 @@
       max-height: 100%;
       object-fit: contain; 
       transform-origin: center;
-      transition: opacity 0.2s; /* 부드러운 페이드 아웃 */
-      opacity: 1; /* 기본은 보이게 설정 */
+      transition: opacity 0.2s;
+      opacity: 1;
+      z-index: 1; /* 배경보다 위에 위치 */
     }
 
     /* 애니메이션 클래스 */
@@ -249,7 +250,7 @@
   </header>
 
   <main>
-    <div class="video-viewport">
+    <div class="video-viewport" id="viewport">
       <div class="video-container" id="vid-bg">
         <video id="main-video" playsinline muted></video>
       </div>
@@ -329,6 +330,7 @@
     const EL = {
       video: $('main-video'),
       vidBg: $('vid-bg'),
+      viewport: $('viewport'),
       canvas: $('piano-roll'),
       ctx: $('piano-roll').getContext('2d'),
       playBtn: $('play-btn'),
@@ -350,10 +352,12 @@
       else EL.statusDot.classList.remove('active');
     }
 
+    // 배경색 실시간 변경 기능 수정함
     EL.hexBg.addEventListener('input', (e) => {
-      const color = e.target.value;
-      if (/^#[0-9A-F]{6}$/i.test(color)) {
+      const color = e.target.value.trim();
+      if (/^#([0-9A-F]{3}){1,2}$/i.test(color)) {
         EL.vidBg.style.backgroundColor = color;
+        EL.viewport.style.backgroundColor = color; // 뷰포트까지 싹 다 변경했음
       }
     });
 
@@ -402,7 +406,6 @@
     }
 
     function executeTrigger(time, note) {
-      // NOTE ON
       Tone.Transport.schedule((t) => {
         Tone.Draw.schedule(() => {
           APP.activeNotes.add(note.midi);
@@ -417,7 +420,6 @@
             APP.currentFlip = 1;
           }
           
-          EL.video.style.setProperty('--sx', APP.currentFlip);
           EL.video.style.transform = `scaleX(${APP.currentFlip})`;
 
           if (EL.inAnim.value === 'pop') {
@@ -433,12 +435,10 @@
         if (APP.sampler) APP.sampler.triggerAttack(note.name, t);
       }, note.time);
 
-      // NOTE OFF
       Tone.Transport.schedule((t) => {
         Tone.Draw.schedule(() => {
           APP.activeNotes.delete(note.midi);
           
-          // 실시간 재생 중에만 아웃 애니메이션 적용
           if (APP.isPlaying && APP.activeNotes.size === 0) {
             if (EL.outAnim.value === 'fade') {
               EL.video.style.opacity = "0";
@@ -461,16 +461,13 @@
 
     EL.playBtn.addEventListener('click', async () => {
       if (APP.isPlaying) {
-        // 정지 모드
         Tone.Transport.stop();
         EL.video.pause();
-        // 정지 버튼을 누르면 무조건 다시 보이게 처리 (zorius 요청)
         EL.video.style.opacity = "1"; 
         APP.isPlaying = false;
         EL.playBtn.textContent = '재생';
         setStatus('일시 정지됨', true);
       } else {
-        // 재생 모드
         await Tone.start();
         await setupPlayback();
         Tone.Transport.start();
