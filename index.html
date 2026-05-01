@@ -7,12 +7,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
   
-  <!-- Vercel Speed Insights -->
-  <script>
-    window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
-  </script>
-  <script src="/_vercel/speed-insights/script.js"></script>
-  
   <style>
     :root {
       --bg: #05050d;
@@ -52,7 +46,6 @@
       z-index: 100;
     }
 
-    /* 깃허브 버튼을 포함할 컨테이너 */
     .header-controls {
       display: flex;
       align-items: center;
@@ -81,11 +74,7 @@
       box-shadow: 0 4px 12px rgba(108, 77, 246, 0.2);
     }
 
-    .github-link svg {
-      width: 20px;
-      height: 20px;
-      fill: currentColor;
-    }
+    .github-link svg { width: 20px; height: 20px; fill: currentColor; }
 
     .status-badge {
       background: var(--surface2);
@@ -113,46 +102,91 @@
       gap: 1rem;
       padding: 0 1rem 1rem 1rem;
       position: relative;
+      overflow: hidden;
     }
 
-    .video-container {
-      position: relative;
-      background: black;
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      overflow: hidden;
+    /* 유튜브 스타일 16:9 뷰포트 고정 */
+    .video-viewport {
       display: flex;
       align-items: center;
       justify-content: center;
+      background: #000;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .video-container {
+      width: 100%;
+      height: 100%;
+      aspect-ratio: 16 / 9;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      transition: background-color 0.3s;
     }
 
     #main-video {
+      /* 세로 영상 대응 핵심 로직: contain으로 비율 수호 */
       max-width: 100%;
       max-height: 100%;
-      transform: scaleX(1);
+      object-fit: contain; 
+      transform-origin: center;
+      transition: opacity 0.1s, transform 0.1s;
     }
 
-    .canvas-container {
+    .sidebar { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 1rem; 
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .sidebar::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 10px; }
+
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; flex-shrink: 0; }
+    
+    .card-title { 
+      font-size: 7px; 
+      font-weight: 700; 
+      margin-bottom: 1rem; 
+      color: var(--accent-glow); 
+      text-transform: uppercase; 
+      letter-spacing: 1.5px; 
+      opacity: 0.8;
+    }
+
+    .piano-roll-card {
+      height: 220px;
+      padding: 0.75rem !important;
+      background: var(--surface2) !important;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .canvas-wrapper {
+      flex: 1;
+      width: 100%;
+      position: relative;
+      background: #000;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    canvas { 
       position: absolute;
-      bottom: 1.5rem;
-      left: 1.5rem;
-      right: 340px;
-      height: 120px;
-      background: rgba(12, 12, 26, 0.6);
-      backdrop-filter: blur(8px);
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      pointer-events: none;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
     }
-    canvas { width: 100%; height: 100%; }
-
-    .sidebar { display: flex; flex-direction: column; gap: 1rem; }
-    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; }
 
     .drop-zone {
       border: 2px dashed var(--border2);
       border-radius: 8px;
-      padding: 1.5rem;
+      padding: 1.25rem;
       text-align: center;
       transition: all 0.2s;
       cursor: pointer;
@@ -160,8 +194,24 @@
       display: block;
     }
     .drop-zone:hover, .drop-zone.dragover { border-color: var(--accent); background: var(--surface2); }
-    .drop-zone p { font-size: 0.85rem; color: var(--text2); pointer-events: none; }
+    .drop-zone p { font-size: 0.75rem; color: var(--text2); pointer-events: none; }
     .drop-zone.loaded { border-style: solid; border-color: var(--green); background: rgba(0, 232, 143, 0.05); }
+
+    .control-group { margin-bottom: 1rem; }
+    .control-label { display: block; font-size: 0.75rem; color: var(--text2); margin-bottom: 0.5rem; }
+    
+    select, input[type="text"] {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.6rem;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.85rem;
+      outline: none;
+    }
+    select:focus, input[type="text"]:focus { border-color: var(--accent); }
 
     .btn {
       width: 100%; padding: 0.75rem; border-radius: 8px; border: none;
@@ -174,6 +224,9 @@
     .btn-secondary.active { border-color: var(--accent2); background: rgba(255, 95, 61, 0.1); color: var(--accent2g); }
 
     input[type="file"] { display: none; }
+
+    .anim-pop { transform: scale(1.05); }
+    .anim-fade-out { opacity: 0; }
   </style>
 </head>
 <body>
@@ -181,7 +234,6 @@
   <header>
     <h1 style="font-size: 1.1rem; font-weight: 700; letter-spacing: -0.5px;">MIDI Video <span style="color: var(--accent);">Freeloading</span></h1>
     <div class="header-controls">
-      <!-- 깃허브 버튼 추가 -->
       <a href="https://github.com/jun479/MIDI-Video-Customize" target="_blank" class="github-link" title="Zorius GitHub">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"></path></svg>
       </a>
@@ -193,15 +245,15 @@
   </header>
 
   <main>
-    <div class="video-container">
-      <video id="main-video" playsinline muted></video>
-      <div class="canvas-container">
-        <canvas id="piano-roll"></canvas>
+    <div class="video-viewport">
+      <div class="video-container" id="vid-bg">
+        <video id="main-video" playsinline muted></video>
       </div>
     </div>
 
     <div class="sidebar">
       <div class="card">
+        <div class="card-title">File Upload</div>
         <label for="midi-input" class="drop-zone" id="midi-zone">
           <p id="midi-label">MIDI 파일을 드롭하거나 클릭하세요</p>
         </label>
@@ -214,9 +266,41 @@
       </div>
 
       <div class="card">
+        <div class="card-title">Animation Controls</div>
+        
+        <div class="control-group">
+          <label class="control-label">인 애니메이션</label>
+          <select id="in-anim-select">
+            <option value="none">없음</option>
+            <option value="pop">팝 (Pop)</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">아웃 애니메이션</label>
+          <select id="out-anim-select">
+            <option value="none">없음</option>
+            <option value="fade">페이드 아웃</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">배경 헥스 코드 (#RRGGBB)</label>
+          <input type="text" id="hex-bg-input" placeholder="#000000" value="#000000">
+        </div>
+
+        <div style="height: 0.5rem;"></div>
+        
         <button id="play-btn" class="btn btn-primary" disabled>재생</button>
         <div style="height: 0.75rem;"></div>
         <button id="flip-btn" class="btn btn-secondary">좌우 반전 모드 토글</button>
+      </div>
+
+      <div class="card piano-roll-card">
+        <div class="card-title">MIDI Piano Roll</div>
+        <div class="canvas-wrapper">
+          <canvas id="piano-roll"></canvas>
+        </div>
       </div>
     </div>
   </main>
@@ -230,16 +314,17 @@
     const APP = {
       midi: null, 
       sampler: null, 
-      audioBuffer: null, 
       isPlaying: false, 
       isFlipMode: false, 
       currentFlip: 1,
       midiLoaded: false, 
-      mediaLoaded: false
+      mediaLoaded: false,
+      activeNotes: new Set()
     };
 
     const EL = {
       video: $('main-video'),
+      vidBg: $('vid-bg'),
       canvas: $('piano-roll'),
       ctx: $('piano-roll').getContext('2d'),
       playBtn: $('play-btn'),
@@ -249,7 +334,10 @@
       midiInput: $('midi-input'),
       mediaInput: $('media-input'),
       statusText: $('status-text'),
-      statusDot: $('status-dot')
+      statusDot: $('status-dot'),
+      inAnim: $('in-anim-select'),
+      outAnim: $('out-anim-select'),
+      hexBg: $('hex-bg-input')
     };
 
     function setStatus(msg, active = false) {
@@ -257,6 +345,13 @@
       if (active) EL.statusDot.classList.add('active');
       else EL.statusDot.classList.remove('active');
     }
+
+    EL.hexBg.addEventListener('input', (e) => {
+      const color = e.target.value;
+      if (/^#[0-9A-F]{6}$/i.test(color)) {
+        EL.vidBg.style.backgroundColor = color;
+      }
+    });
 
     async function handleMidi(file) {
       if (!file) return;
@@ -268,7 +363,6 @@
         EL.midiZone.classList.add('loaded');
         checkReady();
       } catch (e) {
-        console.error(e);
         setStatus('MIDI 파일 형식 오류');
       }
     }
@@ -281,8 +375,6 @@
         EL.video.load();
 
         const arrayBuffer = await file.arrayBuffer();
-        APP.audioBuffer = await Tone.getContext().decodeAudioData(arrayBuffer);
-        
         if (APP.sampler) APP.sampler.dispose();
         APP.sampler = new Tone.Sampler({
           urls: { C4: url },
@@ -293,9 +385,7 @@
             checkReady();
           }
         }).toDestination();
-
       } catch (e) {
-        console.error(e);
         setStatus('미디어 파일 처리 오류');
       }
     }
@@ -303,42 +393,58 @@
     function checkReady() {
       if (APP.midiLoaded && APP.mediaLoaded) {
         EL.playBtn.disabled = false;
-        setStatus('준비 완료! 사운드 샘플러 활성화');
+        setStatus('준비 완료! 퍼포먼스 대기 중');
       }
     }
 
-    function executeTrigger(time, noteName) {
-      Tone.Draw.schedule(() => {
-        EL.video.currentTime = 0;
-        EL.video.play().catch(e => {}); 
-        
-        if (APP.isFlipMode) {
-          APP.currentFlip = APP.currentFlip === 1 ? -1 : 1;
-          EL.video.style.transform = `scaleX(${APP.currentFlip})`;
-        } else {
-          APP.currentFlip = 1;
-          EL.video.style.transform = `scaleX(1)`;
-        }
+    function executeTrigger(time, note) {
+      Tone.Transport.schedule((t) => {
+        Tone.Draw.schedule(() => {
+          APP.activeNotes.add(note.midi);
+          EL.video.currentTime = 0;
+          EL.video.play().catch(() => {});
+          
+          EL.video.classList.remove('anim-fade-out');
+          EL.video.style.opacity = "1";
+          
+          if (EL.inAnim.value === 'pop') {
+            EL.video.classList.add('anim-pop');
+            setTimeout(() => EL.video.classList.remove('anim-pop'), 50);
+          }
 
-        EL.statusDot.classList.add('trigger');
-        setTimeout(() => {
-          EL.statusDot.classList.remove('trigger');
-        }, 50);
-      }, time);
+          if (APP.isFlipMode) {
+            APP.currentFlip = APP.currentFlip === 1 ? -1 : 1;
+            EL.video.style.transform = `scaleX(${APP.currentFlip})`;
+          } else {
+            EL.video.style.transform = `scaleX(1)`;
+          }
 
-      if (APP.sampler) {
-        APP.sampler.triggerAttackRelease(noteName, "4n", time);
-      }
+          EL.statusDot.classList.add('trigger');
+          setTimeout(() => EL.statusDot.classList.remove('trigger'), 50);
+        }, t);
+
+        if (APP.sampler) APP.sampler.triggerAttack(note.name, t);
+      }, note.time);
+
+      Tone.Transport.schedule((t) => {
+        Tone.Draw.schedule(() => {
+          APP.activeNotes.delete(note.midi);
+          if (APP.activeNotes.size === 0) {
+            if (EL.outAnim.value === 'fade') {
+              EL.video.classList.add('anim-fade-out');
+            }
+          }
+        }, t);
+        if (APP.sampler) APP.sampler.triggerRelease(note.name, t);
+      }, note.time + note.duration);
     }
 
     async function setupPlayback() {
       Tone.Transport.cancel();
-      
+      APP.activeNotes.clear();
       APP.midi.tracks.forEach(track => {
         track.notes.forEach(note => {
-          Tone.Transport.schedule((time) => {
-            executeTrigger(time, note.name);
-          }, note.time);
+          executeTrigger(note.time, note);
         });
       });
     }
@@ -349,58 +455,33 @@
         EL.video.pause();
         APP.isPlaying = false;
         EL.playBtn.textContent = '재생';
-        setStatus('여기를 눌러 재생', true);
+        setStatus('일시 정지됨', true);
       } else {
         await Tone.start();
         await setupPlayback();
         Tone.Transport.start();
-        EL.video.play().catch(e => {});
         APP.isPlaying = true;
         EL.playBtn.textContent = '정지';
-        setStatus('연주 중...', true);
+        setStatus('라이브 퍼포먼스 중...', true);
       }
     });
 
     EL.flipBtn.addEventListener('click', () => {
       APP.isFlipMode = !APP.isFlipMode;
       EL.flipBtn.classList.toggle('active', APP.isFlipMode);
-      if (!APP.isFlipMode) {
-        APP.currentFlip = 1;
-        EL.video.style.transform = 'scaleX(1)';
-      }
+      if (!APP.isFlipMode) EL.video.style.transform = 'scaleX(1)';
     });
 
     const initDropZone = (zone, input, handler) => {
-      window.addEventListener('dragover', (e) => e.preventDefault());
-      window.addEventListener('drop', (e) => e.preventDefault());
-
-      zone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        zone.classList.add('dragover');
-      });
-
-      zone.addEventListener('dragleave', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        zone.classList.remove('dragover');
-      });
-
+      zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('dragover'); });
+      zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
       zone.addEventListener('drop', (e) => {
         e.preventDefault();
-        e.stopPropagation();
         zone.classList.remove('dragover');
-        const files = e.dataTransfer.files;
-        if (files && files.length > 0) {
-          handler(files[0]);
-        }
+        if (e.dataTransfer.files.length) handler(e.dataTransfer.files[0]);
       });
-
       input.addEventListener('change', (e) => {
-        const files = e.target.files;
-        if (files && files.length > 0) {
-          handler(files[0]);
-        }
+        if (e.target.files.length) handler(e.target.files[0]);
       });
     };
 
@@ -408,8 +489,9 @@
     initDropZone(EL.mediaZone, EL.mediaInput, handleMedia);
 
     function resizeCanvas() {
-      EL.canvas.width = EL.canvas.parentElement.clientWidth;
-      EL.canvas.height = EL.canvas.parentElement.clientHeight;
+      const wrapper = EL.canvas.parentElement;
+      EL.canvas.width = wrapper.clientWidth;
+      EL.canvas.height = wrapper.clientHeight;
     }
 
     function render() {
@@ -417,20 +499,22 @@
         const time = Tone.Transport.seconds;
         EL.ctx.clearRect(0, 0, EL.canvas.width, EL.canvas.height);
         
-        EL.ctx.strokeStyle = 'rgba(108, 77, 246, 0.5)';
+        EL.ctx.strokeStyle = 'rgba(108, 77, 246, 0.3)';
+        EL.ctx.lineWidth = 1;
         EL.ctx.beginPath();
-        EL.ctx.moveTo(EL.canvas.width / 2, 0);
-        EL.ctx.lineTo(EL.canvas.width / 2, EL.canvas.height);
+        EL.ctx.moveTo(EL.canvas.width / 4, 0);
+        EL.ctx.lineTo(EL.canvas.width / 4, EL.canvas.height);
         EL.ctx.stroke();
 
         APP.midi.tracks.forEach(track => {
           track.notes.forEach(note => {
-            const x = (note.time - time) * 150 + (EL.canvas.width / 2);
-            const y = EL.canvas.height - (note.midi % 24) * (EL.canvas.height / 24);
-            const w = note.duration * 150;
+            const x = (note.time - time) * 100 + (EL.canvas.width / 4);
+            const y = EL.canvas.height - (note.midi % 48) * (EL.canvas.height / 48);
+            const w = note.duration * 100;
+            
             if (x + w > 0 && x < EL.canvas.width) {
               EL.ctx.fillStyle = note.time <= time && note.time + note.duration >= time ? 'var(--accent2)' : 'var(--accent)';
-              EL.ctx.fillRect(x, y, w, 4);
+              EL.ctx.fillRect(x, y, 30, 4);
             }
           });
         });
@@ -439,7 +523,7 @@
     }
 
     window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
+    setTimeout(resizeCanvas, 100);
     render();
   </script>
 </body>
