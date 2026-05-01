@@ -38,7 +38,7 @@
     }
 
     header {
-      padding: 0.75rem 1.5rem; /* 헤더 높이 최소화 */
+      padding: 0.75rem 1.5rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -46,33 +46,61 @@
       border-bottom: 1px solid var(--border);
       z-index: 100;
       gap: 1.5rem;
-      min-height: 64px; /* 기존 헤더 사이즈 유지용 */
+      min-height: 64px;
     }
 
     .title-area {
       display: flex;
-      align-items: center;
-      gap: 1.5rem;
+      flex-direction: column; /* 공지사항 추가를 위해 컬럼 방향으로 설정 */
+      justify-content: center;
       flex: 1;
     }
 
     .main-title {
-      font-size: 1.4rem; /* 타이틀 크기 축소 */
+      font-size: 1.4rem;
       font-weight: 700;
       letter-spacing: -0.5px;
       white-space: nowrap;
       margin: 0;
     }
 
-    .description-text {
-      font-size: 0.7rem; /* 더 작게 조정 */
-      line-height: 1.3;
+    /* 공지사항 스타일링 */
+    .notice-section {
+      margin-top: 4px;
+      font-size: 0.8rem;
+      color: #ccc;
+      line-height: 1.4;
+    }
+
+    .short-notice {
+      font-weight: 700;
       color: var(--text2);
-      word-break: keep-all;
-      max-width: 500px;
-      border-left: 1px solid var(--border2);
-      padding-left: 1.2rem;
-      opacity: 0.8;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .full-notice-details {
+      cursor: pointer;
+      outline: none;
+    }
+
+    .full-notice-details summary {
+      font-size: 0.75rem;
+      color: var(--accent-glow);
+      list-style: none;
+      display: inline-block;
+    }
+
+    .full-notice-details summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .full-notice-content {
+      margin-top: 4px;
+      font-size: 0.75rem;
+      color: #aaa;
+      white-space: pre-line;
+      max-width: 800px;
     }
 
     .header-controls {
@@ -271,10 +299,17 @@
   <header>
     <div class="title-area">
       <h1 class="main-title">MIDI Video <span style="color: var(--accent);">Freeloading</span></h1>
-      <p class="description-text">
-        사용자가 업로드한 MIDI, 오디오, 비디오 파일은 서버로 전송되지 않으며 브라우저에서만 처리됩니다.<br>
-        결과물은 자유롭게 사용 가능하며 출처 표기는 불필요하나, 업로드한 원본 파일의 저작권 및 사용 책임은 사용자에게 있습니다.
-      </p>
+      <div class="notice-section">
+        <span class="short-notice">출처 표기는 불필요하나, 업로드한 원본 파일의 저작권 및 사용 책임은 사용자에게 있습니다.</span>
+        <details id="notice-details" class="full-notice-details">
+          <summary>자세히 보기</summary>
+          <div class="full-notice-content">
+            사용자가 업로드한 MIDI, 오디오, 비디오 파일은 서버로 전송되지 않으며 브라우저에서만 처리됩니다.
+            이 사이트를 사용해 생성된 영상 및 결과물은 자유롭게 녹화, 편집, 업로드 및 공유할 수 있습니다. 본 사이트 출처 표기는 필요하지 않습니다.
+            단, 사용자가 업로드한 MIDI, 오디오, 영상 파일의 저작권은 해당 파일의 원 저작자에게 있으며, 해당 콘텐츠 사용에 대한 책임은 사용자에게 있습니다.
+          </div>
+        </details>
+      </div>
     </div>
     <div class="header-controls">
       <a href="https://github.com/jun479/MIDI-Video-Customize" target="_blank" class="github-link" title="사용 설명서 및 깃허브">
@@ -375,8 +410,18 @@
       statusText: $('status-text'), statusDot: $('status-dot'),
       inAnim: $('in-anim-select'), outAnim: $('out-anim-select'),
       hexBg: $('hex-bg-input'), exportBtn: $('export-audio-btn'),
-      progressBg: $('progress-bg'), progressFill: $('export-progress')
+      progressBg: $('progress-bg'), progressFill: $('export-progress'),
+      noticeDetails: $('notice-details')
     };
+
+    // 장치 기반 공지사항 상태 제어
+    function initNotice() {
+      if (window.innerWidth > 768) {
+        EL.noticeDetails.open = true;
+      } else {
+        EL.noticeDetails.open = false;
+      }
+    }
 
     function setStatus(msg, active = false) {
       EL.statusText.textContent = msg;
@@ -588,9 +633,15 @@
       requestAnimationFrame(render);
     }
 
-    window.onresize = resizeCanvas;
-    setTimeout(resizeCanvas, 100);
-    render();
+    window.onload = () => {
+      initNotice();
+      resizeCanvas();
+      render();
+    };
+    window.onresize = () => {
+      initNotice();
+      resizeCanvas();
+    };
   </script>
 </body>
 </html>
