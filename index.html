@@ -38,22 +38,22 @@
     }
 
     header {
-      padding: 0.75rem 1.5rem;
+      padding: 0 1.5rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
       background: rgba(5, 5, 13, 0.9);
       border-bottom: 1px solid var(--border);
       z-index: 100;
-      gap: 1.5rem;
-      min-height: 64px;
+      height: 64px; /* 헤더 높이 고정 */
     }
 
-    .title-area {
+    .title-group {
       display: flex;
-      flex-direction: column;
-      justify-content: center;
+      align-items: center; /* 옆으로 배치 */
+      gap: 1rem;
       flex: 1;
+      overflow: hidden;
     }
 
     .main-title {
@@ -61,59 +61,50 @@
       font-weight: 700;
       letter-spacing: -0.5px;
       white-space: nowrap;
-      margin: 0;
     }
 
     /* --- 공지사항 섹션 --- */
     .notice-section {
-      margin-top: 4px;
       font-size: 0.8rem;
-      color: #ccc;
-      line-height: 1.4;
-    }
-
-    .short-notice {
-      font-weight: 700;
       color: var(--text2);
-      display: block;
-      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    /* PC 화면 설정: 상세 내용을 평문으로 노출 */
-    .full-notice-desktop {
-      display: block;
-      font-size: 0.75rem;
-      color: #aaa;
-      white-space: pre-line;
-      max-width: 900px;
-    }
+    .pc-notice { display: block; }
+    .mobile-notice { display: none; }
 
-    /* 모바일 화면용 details 숨김 (기본) */
-    .full-notice-mobile {
-      display: none;
-    }
-
-    /* 반응형 제어 */
-    @media (max-width: 768px) {
-      .full-notice-desktop {
-        display: none; /* PC용 평문 숨김 */
-      }
-      .full-notice-mobile {
-        display: block; /* 모바일용 details 노출 */
-      }
-      .full-notice-mobile summary {
-        font-size: 0.75rem;
+    @media (max-width: 1024px) {
+      .pc-notice { display: none; }
+      .mobile-notice { display: block; }
+      
+      .mobile-notice summary {
+        font-size: 0.7rem;
         color: var(--accent-glow);
         cursor: pointer;
         list-style: none;
-        outline: none;
+        padding: 4px 8px;
+        background: var(--surface2);
+        border-radius: 4px;
       }
-      .full-notice-mobile summary::-webkit-details-marker { display: none; }
-      .full-notice-content {
-        margin-top: 4px;
+      .mobile-notice summary::-webkit-details-marker { display: none; }
+      
+      .mobile-content {
+        position: absolute;
+        top: 60px;
+        left: 1.5rem;
+        right: 1.5rem;
+        background: var(--surface3);
+        padding: 1rem;
+        border-radius: 8px;
+        border: 1px solid var(--accent);
+        white-space: normal;
+        z-index: 200;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         font-size: 0.75rem;
-        color: #aaa;
-        white-space: pre-line;
+        color: #ddd;
+        line-height: 1.5;
       }
     }
 
@@ -133,35 +124,26 @@
       border: 1px solid var(--border);
       border-radius: 50%;
       color: var(--text2);
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.2s;
       text-decoration: none;
     }
 
-    .github-link:hover {
-      color: white;
-      border-color: var(--accent);
-      background: var(--surface3);
-      transform: translateY(-2px);
-    }
-
+    .github-link:hover { color: white; border-color: var(--accent); transform: translateY(-2px); }
     .github-link svg { width: 20px; height: 20px; fill: currentColor; }
 
     .status-badge {
       background: var(--surface2);
       border: 1px solid var(--border);
-      padding: 0.5rem 1rem;
+      padding: 0.4rem 0.8rem;
       border-radius: 20px;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       color: var(--text2);
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      white-space: nowrap;
     }
     
-    .status-dot { 
-      width: 8px; height: 8px; border-radius: 50%; background: #2a2a5a; 
-    }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #2a2a5a; }
     .status-dot.active { background: var(--green); box-shadow: 0 0 10px var(--green); }
     .status-dot.trigger { background: var(--accent2) !important; box-shadow: 0 0 15px var(--accent2) !important; }
 
@@ -171,7 +153,6 @@
       grid-template-columns: 1fr 320px;
       gap: 1rem;
       padding: 1rem;
-      position: relative;
       overflow: hidden;
     }
 
@@ -189,22 +170,17 @@
     .video-container {
       width: 100%;
       height: 100%;
-      aspect-ratio: 16 / 9;
       background: #000;
       display: flex;
       align-items: center;
       justify-content: center;
-      position: relative;
     }
 
     #main-video {
       max-width: 100%;
       max-height: 100%;
       object-fit: contain; 
-      transform-origin: center;
-      transition: opacity 0.2s;
       opacity: 1;
-      z-index: 1;
     }
 
     .anim-pop { animation: pop-effect 0.1s ease-out; }
@@ -214,96 +190,37 @@
       100% { transform: scale(1) scaleX(var(--sx, 1)) scaleY(var(--sy, 1)); }
     }
 
-    .sidebar { 
-      display: flex; 
-      flex-direction: column; 
-      gap: 1rem; 
-      overflow-y: auto;
-      padding-right: 4px;
-    }
+    .sidebar { display: flex; flex-direction: column; gap: 1rem; overflow-y: auto; padding-right: 4px; }
     .sidebar::-webkit-scrollbar { width: 4px; }
     .sidebar::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 10px; }
 
-    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; flex-shrink: 0; }
-    
-    .card-title { 
-      font-size: 0.65rem; 
-      font-weight: 700; 
-      margin-bottom: 1rem; 
-      color: var(--accent-glow); 
-      text-transform: uppercase; 
-      letter-spacing: 1.5px; 
-      opacity: 0.8;
-    }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; }
+    .card-title { font-size: 0.65rem; font-weight: 700; margin-bottom: 1rem; color: var(--accent-glow); text-transform: uppercase; letter-spacing: 1.5px; }
 
-    .piano-roll-card {
-      height: 250px;
-      padding: 0.75rem !important;
-      background: var(--surface2) !important;
-      display: flex;
-      flex-direction: column;
-    }
-    
-    .canvas-wrapper {
-      flex: 1;
-      width: 100%;
-      position: relative;
-      background: #000;
-      border-radius: 6px;
-      overflow: hidden;
-    }
+    .piano-roll-card { height: 250px; padding: 0.75rem; background: var(--surface2); display: flex; flex-direction: column; }
+    .canvas-wrapper { flex: 1; width: 100%; position: relative; background: #000; border-radius: 6px; overflow: hidden; }
+    canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
-    canvas { 
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-    }
-
-    .drop-zone {
-      border: 2px dashed var(--border2);
-      border-radius: 8px;
-      padding: 1rem;
-      text-align: center;
-      transition: all 0.2s;
-      cursor: pointer;
-      margin-bottom: 0.75rem;
-      display: block;
-    }
-    .drop-zone:hover, .drop-zone.dragover { border-color: var(--accent); background: var(--surface2); }
-    .drop-zone p { font-size: 0.7rem; color: var(--text2); pointer-events: none; }
+    .drop-zone { border: 2px dashed var(--border2); border-radius: 8px; padding: 1rem; text-align: center; cursor: pointer; margin-bottom: 0.75rem; display: block; }
+    .drop-zone p { font-size: 0.7rem; color: var(--text2); }
     .drop-zone.loaded { border-style: solid; border-color: var(--green); background: rgba(0, 232, 143, 0.05); }
 
     .control-group { margin-bottom: 0.8rem; }
     .control-label { display: block; font-size: 0.75rem; color: var(--text2); margin-bottom: 0.4rem; }
     
     select, input[type="text"] {
-      width: 100%;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 0.5rem;
-      color: var(--text);
-      font-family: inherit;
-      font-size: 0.8rem;
-      outline: none;
+      width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 0.5rem; color: var(--text); font-size: 0.8rem; outline: none;
     }
 
-    .btn {
-      width: 100%; padding: 0.7rem; border-radius: 8px; border: none;
-      font-family: inherit; font-weight: 600; cursor: pointer;
-      transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
-      font-size: 0.85rem;
-    }
+    .btn { width: 100%; padding: 0.7rem; border-radius: 8px; border: none; font-family: inherit; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-size: 0.85rem; }
     .btn-primary { background: var(--accent); color: white; }
     .btn-primary:disabled { background: var(--surface3); color: var(--text3); cursor: not-allowed; }
     .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
     .btn-secondary.active { border-color: var(--accent2); background: rgba(255, 95, 61, 0.1); color: var(--accent2g); }
-    
     .btn-export { background: #8a70ff; color: white; margin-top: 0.75rem; }
-    .btn-export:disabled { opacity: 0.7; cursor: wait; }
 
     .progress-bg { width: 100%; height: 6px; background: var(--surface3); border-radius: 3px; overflow: hidden; display: none; margin-bottom: 8px; }
-    #export-progress { width: 0%; height: 100%; background: var(--green); transition: width 0.1s linear; }
+    #export-progress { width: 0%; height: 100%; background: var(--green); }
 
     input[type="file"] { display: none; }
   </style>
@@ -311,34 +228,34 @@
 <body>
 
   <header>
-    <div class="title-area">
+    <div class="title-group">
       <h1 class="main-title">MIDI Video <span style="color: var(--accent);">Freeloading</span></h1>
+      
       <div class="notice-section">
-        <span class="short-notice">출처 표기는 불필요하나, 업로드한 원본 파일의 저작권 및 사용 책임은 사용자에게 있습니다.</span>
-        
-        <!-- PC용: 버튼 없이 바로 노출 -->
-        <div class="full-notice-desktop">
-          사용자가 업로드한 파일은 브라우저에서만 처리됩니다. 결과물은 자유롭게 사용 가능하나 파일의 저작권 및 사용 책임은 사용자에게 있습니다.
+        <!-- PC: 타이틀 옆에 바로 노출 -->
+        <div class="pc-notice">
+          출처 표기 불필요 · 원본 저작권 책임은 사용자에게 있음
         </div>
-
-        <!-- 모바일용: 자세히 보기 버튼 적용 -->
-        <details class="full-notice-mobile">
+        
+        <!-- 모바일: 버튼형태 -->
+        <details class="mobile-notice">
           <summary>자세히 보기</summary>
-          <div class="full-notice-content">
-            사용자가 업로드한 MIDI, 오디오, 비디오 파일은 서버로 전송되지 않으며 브라우저에서만 처리됩니다.
-            이 사이트를 사용해 생성된 영상 및 결과물은 자유롭게 녹화, 편집, 업로드 및 공유할 수 있습니다. 본 사이트 출처 표기는 필요하지 않습니다.
-            단, 사용자가 업로드한 MIDI, 오디오, 영상 파일의 저작권은 해당 파일의 원 저작자에게 있으며, 해당 콘텐츠 사용에 대한 책임은 사용자에게 있습니다.
+          <div class="mobile-content">
+            본 사이트를 통해 생성된 결과물은 자유롭게 사용 가능하며 출처 표기는 불필요합니다. 
+            단, 업로드한 파일의 저작권 및 사용 책임은 전적으로 사용자에게 있습니다. 
+            모든 처리는 브라우저에서 이루어지며 파일은 서버로 전송되지 않습니다.
           </div>
         </details>
       </div>
     </div>
+
     <div class="header-controls">
-      <a href="https://github.com/jun479/MIDI-Video-Customize" target="_blank" class="github-link" title="사용 설명서 및 깃허브">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"></path></svg>
+      <a href="https://github.com/jun479/MIDI-Video-Customize" target="_blank" class="github-link">
+        <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"></path></svg>
       </a>
       <div class="status-badge">
         <div id="status-dot" class="status-dot"></div>
-        <span id="status-text">파일 업로드 대기</span>
+        <span id="status-text">Ready</span>
       </div>
     </div>
   </header>
@@ -353,41 +270,17 @@
     <div class="sidebar">
       <div class="card">
         <div class="card-title">File Upload</div>
-        <label for="midi-input" class="drop-zone" id="midi-zone">
-          <p id="midi-label">MIDI 드롭/클릭</p>
-        </label>
+        <label for="midi-input" class="drop-zone" id="midi-zone"><p id="midi-label">MIDI 드롭/클릭</p></label>
         <input type="file" id="midi-input" accept=".mid,.midi">
-
-        <label for="media-input" class="drop-zone" id="media-zone">
-          <p id="media-label">미디어 드롭/클릭</p>
-        </label>
+        <label for="media-input" class="drop-zone" id="media-zone"><p id="media-label">미디어 드롭/클릭</p></label>
         <input type="file" id="media-input" accept="video/*,audio/*">
       </div>
 
       <div class="card">
         <div class="card-title">Animation Controls</div>
-        
-        <div class="control-group">
-          <label class="control-label">인 애니메이션</label>
-          <select id="in-anim-select">
-            <option value="none">없음</option>
-            <option value="pop">팝 (Pop)</option>
-          </select>
-        </div>
-
-        <div class="control-group">
-          <label class="control-label">아웃 애니메이션</label>
-          <select id="out-anim-select">
-            <option value="none">없음</option>
-            <option value="fade">페이드 아웃</option>
-          </select>
-        </div>
-
-        <div class="control-group">
-          <label class="control-label">배경 헥스 코드</label>
-          <input type="text" id="hex-bg-input" placeholder="#000000" value="#000000">
-        </div>
-
+        <div class="control-group"><label class="control-label">인 애니메이션</label><select id="in-anim-select"><option value="none">없음</option><option value="pop">팝 (Pop)</option></select></div>
+        <div class="control-group"><label class="control-label">아웃 애니메이션</label><select id="out-anim-select"><option value="none">없음</option><option value="fade">페이드 아웃</option></select></div>
+        <div class="control-group"><label class="control-label">배경 헥스 코드</label><input type="text" id="hex-bg-input" placeholder="#000000" value="#000000"></div>
         <button id="play-btn" class="btn btn-primary" disabled>재생</button>
         <div style="height: 0.5rem;"></div>
         <button id="flip-h-btn" class="btn btn-secondary">좌우 반전</button>
@@ -397,13 +290,9 @@
 
       <div class="card piano-roll-card">
         <div class="card-title">MIDI Piano Roll</div>
-        <div class="canvas-wrapper">
-          <canvas id="piano-roll"></canvas>
-        </div>
-        <div class="export-container">
-          <div class="progress-bg" id="progress-bg"><div id="export-progress"></div></div>
-          <button id="export-audio-btn" class="btn btn-export" disabled>WAV 추출</button>
-        </div>
+        <div class="canvas-wrapper"><canvas id="piano-roll"></canvas></div>
+        <div class="progress-bg" id="progress-bg"><div id="export-progress"></div></div>
+        <button id="export-audio-btn" class="btn btn-export" disabled>WAV 추출</button>
       </div>
     </div>
   </main>
@@ -413,239 +302,61 @@
 
   <script>
     const $ = id => document.getElementById(id);
-    
-    const APP = {
-      midi: null, sampler: null, isPlaying: false, 
-      isFlipHMode: false, isFlipVMode: false,
-      currentFlipX: 1, currentFlipY: 1,
-      midiLoaded: false, mediaLoaded: false,
-      activeNotes: new Set(), currentMediaUrl: null
-    };
+    const APP = { midi: null, sampler: null, isPlaying: false, currentFlipX: 1, currentFlipY: 1, isFlipHMode: false, isFlipVMode: false, midiLoaded: false, mediaLoaded: false, activeNotes: new Set(), currentMediaUrl: null };
+    const EL = { video: $('main-video'), vidBg: $('vid-bg'), viewport: $('viewport'), canvas: $('piano-roll'), ctx: $('piano-roll').getContext('2d'), playBtn: $('play-btn'), flipHBtn: $('flip-h-btn'), flipVBtn: $('flip-v-btn'), midiZone: $('midi-zone'), mediaZone: $('media-zone'), midiInput: $('midi-input'), mediaInput: $('media-input'), statusText: $('status-text'), statusDot: $('status-dot'), inAnim: $('in-anim-select'), outAnim: $('out-anim-select'), hexBg: $('hex-bg-input'), exportBtn: $('export-audio-btn'), progressBg: $('progress-bg'), progressFill: $('export-progress') };
 
-    const EL = {
-      video: $('main-video'), vidBg: $('vid-bg'), viewport: $('viewport'),
-      canvas: $('piano-roll'), ctx: $('piano-roll').getContext('2d'),
-      playBtn: $('play-btn'), flipHBtn: $('flip-h-btn'), flipVBtn: $('flip-v-btn'),
-      midiZone: $('midi-zone'), mediaZone: $('media-zone'),
-      midiInput: $('midi-input'), mediaInput: $('media-input'),
-      statusText: $('status-text'), statusDot: $('status-dot'),
-      inAnim: $('in-anim-select'), outAnim: $('out-anim-select'),
-      hexBg: $('hex-bg-input'), exportBtn: $('export-audio-btn'),
-      progressBg: $('progress-bg'), progressFill: $('export-progress')
-    };
+    function setStatus(msg, active = false) { EL.statusText.textContent = msg; if (active) EL.statusDot.classList.add('active'); else EL.statusDot.classList.remove('active'); }
+    EL.hexBg.oninput = e => { if (/^#([0-9A-F]{3}){1,2}$/i.test(e.target.value)) EL.vidBg.style.backgroundColor = EL.viewport.style.backgroundColor = e.target.value; };
 
-    function setStatus(msg, active = false) {
-      EL.statusText.textContent = msg;
-      if (active) EL.statusDot.classList.add('active');
-      else EL.statusDot.classList.remove('active');
-    }
+    async function handleMidi(f) { try { const b = await f.arrayBuffer(); APP.midi = new Midi(b); APP.midiLoaded = true; $('midi-label').textContent = `✓ MIDI: ${f.name.substring(0,8)}`; EL.midiZone.classList.add('loaded'); checkReady(); } catch(e){} }
+    async function handleMedia(f) { try { if (APP.currentMediaUrl) URL.revokeObjectURL(APP.currentMediaUrl); APP.currentMediaUrl = URL.createObjectURL(f); EL.video.src = APP.currentMediaUrl; EL.video.load(); if (APP.sampler) APP.sampler.dispose(); APP.sampler = new Tone.Sampler({ urls: { C4: APP.currentMediaUrl }, onload: () => { APP.mediaLoaded = true; $('media-label').textContent = `✓ 미디어 로드됨`; EL.mediaZone.classList.add('loaded'); checkReady(); } }).toDestination(); } catch(e){} }
+    function checkReady() { if (APP.midiLoaded && APP.mediaLoaded) { EL.playBtn.disabled = EL.exportBtn.disabled = false; setStatus('Ready', true); } }
 
-    EL.hexBg.addEventListener('input', (e) => {
-      const color = e.target.value.trim();
-      if (/^#([0-9A-F]{3}){1,2}$/i.test(color)) {
-        EL.vidBg.style.backgroundColor = color;
-        EL.viewport.style.backgroundColor = color;
-      }
-    });
-
-    async function handleMidi(file) {
-      if (!file) return;
-      try {
-        const arrayBuffer = await file.arrayBuffer();
-        APP.midi = new Midi(arrayBuffer);
-        APP.midiLoaded = true;
-        $('midi-label').textContent = `✓ MIDI: ${file.name.substring(0, 10)}...`;
-        EL.midiZone.classList.add('loaded');
-        checkReady();
-      } catch (e) { setStatus('MIDI 오류'); }
-    }
-
-    async function handleMedia(file) {
-      if (!file) return;
-      try {
-        if (APP.currentMediaUrl) URL.revokeObjectURL(APP.currentMediaUrl);
-        const url = URL.createObjectURL(file);
-        APP.currentMediaUrl = url;
-        EL.video.src = url;
-        EL.video.load();
-
-        if (APP.sampler) APP.sampler.dispose();
-        APP.sampler = new Tone.Sampler({
-          urls: { C4: url },
-          onload: () => {
-            APP.mediaLoaded = true;
-            $('media-label').textContent = `✓ 미디어 완료`;
-            EL.mediaZone.classList.add('loaded');
-            checkReady();
-          }
-        }).toDestination();
-      } catch (e) { setStatus('미디어 오류'); }
-    }
-
-    function checkReady() {
-      if (APP.midiLoaded && APP.mediaLoaded) {
-        EL.playBtn.disabled = false;
-        EL.exportBtn.disabled = false;
-        setStatus('Ready!', true);
-      }
-    }
-
-    function applyTransform() {
-      EL.video.style.transform = `scaleX(${APP.currentFlipX}) scaleY(${APP.currentFlipY})`;
-      EL.video.style.setProperty('--sx', APP.currentFlipX);
-      EL.video.style.setProperty('--sy', APP.currentFlipY);
-    }
-
-    function executeTrigger(time, note) {
-      Tone.Transport.schedule((t) => {
+    function executeTrigger(note) {
+      Tone.Transport.schedule(t => {
         Tone.Draw.schedule(() => {
-          APP.activeNotes.add(note.midi);
-          EL.video.currentTime = 0;
-          EL.video.play().catch(() => {});
-          EL.video.style.opacity = "1";
-          if (APP.isFlipHMode) APP.currentFlipX = (APP.currentFlipX === 1) ? -1 : 1;
-          if (APP.isFlipVMode) APP.currentFlipY = (APP.currentFlipY === 1) ? -1 : 1;
-          applyTransform();
-          if (EL.inAnim.value === 'pop') {
-            EL.video.classList.remove('anim-pop');
-            void EL.video.offsetWidth; 
-            EL.video.classList.add('anim-pop');
-          }
-          EL.statusDot.classList.add('trigger');
-          setTimeout(() => EL.statusDot.classList.remove('trigger'), 50);
+          APP.activeNotes.add(note.midi); EL.video.currentTime = 0; EL.video.play().catch(()=>{}); EL.video.style.opacity = "1";
+          if (APP.isFlipHMode) APP.currentFlipX *= -1; if (APP.isFlipVMode) APP.currentFlipY *= -1;
+          EL.video.style.transform = `scaleX(${APP.currentFlipX}) scaleY(${APP.currentFlipY})`;
+          if (EL.inAnim.value === 'pop') { EL.video.classList.remove('anim-pop'); void EL.video.offsetWidth; EL.video.classList.add('anim-pop'); }
+          EL.statusDot.classList.add('trigger'); setTimeout(() => EL.statusDot.classList.remove('trigger'), 50);
         }, t);
         if (APP.sampler) APP.sampler.triggerAttack(note.name, t);
       }, note.time);
-
-      Tone.Transport.schedule((t) => {
-        Tone.Draw.schedule(() => {
-          APP.activeNotes.delete(note.midi);
-          if (APP.isPlaying && APP.activeNotes.size === 0 && EL.outAnim.value === 'fade') {
-            EL.video.style.opacity = "0";
-          }
-        }, t);
+      Tone.Transport.schedule(t => {
+        Tone.Draw.schedule(() => { APP.activeNotes.delete(note.midi); if (APP.activeNotes.size === 0 && EL.outAnim.value === 'fade') EL.video.style.opacity = "0"; }, t);
         if (APP.sampler) APP.sampler.triggerRelease(note.name, t);
       }, note.time + note.duration);
     }
 
-    async function setupPlayback() {
-      Tone.Transport.cancel();
-      APP.activeNotes.clear();
-      APP.midi.tracks.forEach(track => {
-        track.notes.forEach(note => { executeTrigger(note.time, note); });
-      });
-    }
-
     EL.playBtn.onclick = async () => {
-      if (APP.isPlaying) {
-        Tone.Transport.stop();
-        EL.video.pause();
-        APP.isPlaying = false;
-        EL.playBtn.textContent = '재생';
-      } else {
-        await Tone.start();
-        await setupPlayback();
-        Tone.Transport.start();
-        APP.isPlaying = true;
-        EL.playBtn.textContent = '정지';
-      }
+      if (APP.isPlaying) { Tone.Transport.stop(); EL.video.pause(); APP.isPlaying = false; EL.playBtn.textContent = '재생'; }
+      else { await Tone.start(); Tone.Transport.cancel(); APP.midi.tracks.forEach(tr => tr.notes.forEach(executeTrigger)); Tone.Transport.start(); APP.isPlaying = true; EL.playBtn.textContent = '정지'; }
     };
 
-    EL.flipHBtn.onclick = () => {
-      APP.isFlipHMode = !APP.isFlipHMode;
-      EL.flipHBtn.classList.toggle('active', APP.isFlipHMode);
-      if (!APP.isFlipHMode) { APP.currentFlipX = 1; applyTransform(); }
-    };
+    EL.flipHBtn.onclick = () => { APP.isFlipHMode = !APP.isFlipHMode; EL.flipHBtn.classList.toggle('active'); if(!APP.isFlipHMode) { APP.currentFlipX = 1; EL.video.style.transform = `scaleX(1) scaleY(${APP.currentFlipY})`; } };
+    EL.flipVBtn.onclick = () => { APP.isFlipVMode = !APP.isFlipVMode; EL.flipVBtn.classList.toggle('active'); if(!APP.isFlipVMode) { APP.currentFlipY = 1; EL.video.style.transform = `scaleX(${APP.currentFlipX}) scaleY(1)`; } };
 
-    EL.flipVBtn.onclick = () => {
-      APP.isFlipVMode = !APP.isFlipVMode;
-      EL.flipVBtn.classList.toggle('active', APP.isFlipVMode);
-      if (!APP.isFlipVMode) { APP.currentFlipY = 1; applyTransform(); }
-    };
-
-    EL.exportBtn.onclick = async () => {
-      if (!APP.midi || !APP.currentMediaUrl) return;
-      EL.exportBtn.disabled = true;
-      EL.progressBg.style.display = 'block';
-      const duration = APP.midi.duration + 2; 
-      try {
-        const buffer = await Tone.Offline(async (context) => {
-          const offlineSampler = new Tone.Sampler({ urls: { C4: APP.currentMediaUrl } }).toDestination();
-          await Tone.loaded();
-          APP.midi.tracks.forEach(track => {
-            track.notes.forEach(note => { offlineSampler.triggerAttackRelease(note.name, note.duration, note.time); });
-          });
-        }, duration, (p) => {
-          EL.progressFill.style.width = `${p * 100}%`;
-        });
-        const wavBlob = audioBufferToWav(buffer);
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(wavBlob);
-        a.download = `MIDI_Export.wav`;
-        a.click();
-      } catch (err) {}
-      finally { setTimeout(() => { EL.exportBtn.disabled = false; EL.progressBg.style.display = 'none'; }, 2000); }
-    };
-
-    function audioBufferToWav(buffer) {
-      const numOfChan = buffer.numberOfChannels, length = buffer.length * numOfChan * 2 + 44;
-      const bufferOut = new ArrayBuffer(length), view = new DataView(bufferOut);
-      const channels = []; let i, sample, offset = 0, pos = 0;
-      const setUint16 = d => { view.setUint16(pos, d, true); pos += 2; };
-      const setUint32 = d => { view.setUint32(pos, d, true); pos += 4; };
-      setUint32(0x46464952); setUint32(length - 8); setUint32(0x45564157); setUint32(0x20746d66); setUint32(16); setUint16(1); setUint16(numOfChan);
-      setUint32(buffer.sampleRate); setUint32(buffer.sampleRate * 2 * numOfChan); setUint16(numOfChan * 2); setUint16(16); setUint32(0x61746164); setUint32(length - pos - 4);
-      for (i = 0; i < buffer.numberOfChannels; i++) channels.push(buffer.getChannelData(i));
-      while (pos < length) {
-        for (i = 0; i < numOfChan; i++) {
-          sample = Math.max(-1, Math.min(1, channels[i][offset]));
-          sample = (sample < 0 ? sample * 0x8000 : sample * 0x7FFF) | 0;
-          view.setInt16(pos, sample, true); pos += 2;
-        }
-        offset++;
-      }
-      return new Blob([bufferOut], { type: 'audio/wav' });
-    }
-
-    const initDropZone = (zone, input, handler) => {
-      zone.ondragover = e => { e.preventDefault(); zone.classList.add('dragover'); };
-      zone.ondragleave = () => zone.classList.remove('dragover');
-      zone.ondrop = e => { e.preventDefault(); zone.classList.remove('dragover'); if (e.dataTransfer.files.length) handler(e.dataTransfer.files[0]); };
-      input.onchange = e => { if (e.target.files.length) handler(e.target.files[0]); };
-    };
-
-    initDropZone(EL.midiZone, EL.midiInput, handleMidi);
-    initDropZone(EL.mediaZone, EL.mediaInput, handleMedia);
-
-    function resizeCanvas() {
-      const wrapper = EL.canvas.parentElement;
-      EL.canvas.width = wrapper.clientWidth;
-      EL.canvas.height = wrapper.clientHeight;
-    }
+    const initDrop = (z, i, h) => { z.ondragover = e => { e.preventDefault(); z.classList.add('dragover'); }; z.ondragleave = () => z.classList.remove('dragover'); z.ondrop = e => { e.preventDefault(); h(e.dataTransfer.files[0]); }; i.onchange = e => h(e.target.files[0]); };
+    initDrop(EL.midiZone, EL.midiInput, handleMidi); initDrop(EL.mediaZone, EL.mediaInput, handleMedia);
 
     function render() {
       if (APP.isPlaying && APP.midi) {
         const time = Tone.Transport.seconds;
         EL.ctx.clearRect(0, 0, EL.canvas.width, EL.canvas.height);
-        EL.ctx.strokeStyle = 'rgba(108, 77, 246, 0.3)';
-        EL.ctx.lineWidth = 1;
-        EL.ctx.beginPath(); EL.ctx.moveTo(EL.canvas.width / 4, 0); EL.ctx.lineTo(EL.canvas.width / 4, EL.canvas.height); EL.ctx.stroke();
-        APP.midi.tracks.forEach(track => {
-          track.notes.forEach(note => {
-            const x = (note.time - time) * 100 + (EL.canvas.width / 4);
-            const y = EL.canvas.height - (note.midi % 48) * (EL.canvas.height / 48);
-            if (x + 30 > 0 && x < EL.canvas.width) {
-              EL.ctx.fillStyle = note.time <= time && note.time + note.duration >= time ? 'var(--accent2)' : '#FFFFFF';
-              EL.ctx.fillRect(x, y, 30, 4);
-            }
-          });
-        });
+        EL.ctx.fillStyle = '#FFFFFF';
+        APP.midi.tracks.forEach(tr => tr.notes.forEach(n => {
+          const x = (n.time - time) * 100 + (EL.canvas.width / 4);
+          const y = EL.canvas.height - (n.midi % 48) * (EL.canvas.height / 48);
+          if (x + 30 > 0 && x < EL.canvas.width) {
+            if (n.time <= time && n.time + n.duration >= time) EL.ctx.fillStyle = 'var(--accent2)'; else EL.ctx.fillStyle = '#FFFFFF';
+            EL.ctx.fillRect(x, y, 30, 4);
+          }
+        }));
       }
       requestAnimationFrame(render);
     }
-
-    window.onload = () => { resizeCanvas(); render(); };
-    window.onresize = () => { resizeCanvas(); };
+    window.onload = () => { EL.canvas.width = EL.canvas.parentElement.clientWidth; EL.canvas.height = EL.canvas.parentElement.clientHeight; render(); };
   </script>
 </body>
 </html>
