@@ -24,7 +24,6 @@
       --text2: #8890b0;
       --text3: #4a5078;
       --radius: 12px;
-      --modal-bg: rgba(5, 5, 13, 0.85);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -139,6 +138,7 @@
       z-index: 1;
     }
 
+    /* 애니메이션 클래스 */
     .anim-pop { animation: pop-effect 0.1s ease-out; }
     @keyframes pop-effect {
       0% { transform: scale(0.95) scaleX(var(--sx, 1)) scaleY(var(--sy, 1)); }
@@ -219,6 +219,7 @@
       font-size: 0.85rem;
       outline: none;
     }
+    select:focus, input[type="text"]:focus { border-color: var(--accent); }
 
     .btn {
       width: 100%; padding: 0.75rem; border-radius: 8px; border: none;
@@ -226,50 +227,9 @@
       transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
     }
     .btn-primary { background: var(--accent); color: white; }
-    .btn-primary:hover { filter: brightness(1.2); }
     .btn-primary:disabled { background: var(--surface3); color: var(--text3); cursor: not-allowed; }
     .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
-    .btn-secondary:hover { background: var(--surface3); }
     .btn-secondary.active { border-color: var(--accent2); background: rgba(255, 95, 61, 0.1); color: var(--accent2g); }
-    
-    .btn-export { background: #8a70ff; color: white; margin-top: 1rem; }
-    .btn-danger { background: var(--accent2); color: white; }
-
-    /* Modal Styles */
-    #export-modal {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: var(--modal-bg);
-      backdrop-filter: blur(12px);
-      z-index: 1000;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s ease;
-    }
-
-    .modal-content {
-      background: var(--surface);
-      border: 1px solid var(--border2);
-      border-radius: 20px;
-      padding: 2.5rem;
-      width: 90%;
-      max-width: 450px;
-      text-align: center;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-    }
-
-    .modal-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; color: white; }
-    .modal-desc { font-size: 0.9rem; color: var(--text2); margin-bottom: 2rem; }
-
-    .export-options { display: flex; flex-direction: column; gap: 0.75rem; }
-    
-    .progress-container { display: none; margin-top: 1rem; }
-    .progress-bar-bg { width: 100%; height: 8px; background: var(--surface2); border-radius: 4px; overflow: hidden; margin-bottom: 1rem; }
-    #progress-fill { width: 0%; height: 100%; background: var(--accent); transition: width 0.1s linear; }
-    .progress-text { font-size: 0.8rem; color: var(--text3); margin-bottom: 1rem; display: block; }
-
-    .finish-options { display: none; flex-direction: column; gap: 0.75rem; }
 
     input[type="file"] { display: none; }
   </style>
@@ -279,8 +239,8 @@
   <header>
     <h1 style="font-size: 1.1rem; font-weight: 700; letter-spacing: -0.5px;">MIDI Video <span style="color: var(--accent);">Freeloading</span></h1>
     <div class="header-controls">
-      <a href="https://github.com/jun479/MIDI-Video-Customize" target="_blank" class="github-link">
-        <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"></path></svg>
+      <a href="https://github.com/jun479/MIDI-Video-Customize" target="_blank" class="github-link" title="Zorius GitHub">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"></path></svg>
       </a>
       <div class="status-badge">
         <div id="status-dot" class="status-dot"></div>
@@ -312,6 +272,7 @@
 
       <div class="card">
         <div class="card-title">Animation Controls</div>
+        
         <div class="control-group">
           <label class="control-label">인 애니메이션</label>
           <select id="in-anim-select">
@@ -319,6 +280,7 @@
             <option value="pop">팝 (Pop)</option>
           </select>
         </div>
+
         <div class="control-group">
           <label class="control-label">아웃 애니메이션</label>
           <select id="out-anim-select">
@@ -326,10 +288,14 @@
             <option value="fade">페이드 아웃</option>
           </select>
         </div>
+
         <div class="control-group">
-          <label class="control-label">배경 헥스 코드</label>
-          <input type="text" id="hex-bg-input" value="#000000">
+          <label class="control-label">배경 헥스 코드 (#RRGGBB)</label>
+          <input type="text" id="hex-bg-input" placeholder="#000000" value="#000000">
         </div>
+
+        <div style="height: 0.5rem;"></div>
+        
         <button id="play-btn" class="btn btn-primary" disabled>재생</button>
         <div style="height: 0.75rem;"></div>
         <button id="flip-h-btn" class="btn btn-secondary">좌우 반전 모드 토글</button>
@@ -342,47 +308,9 @@
         <div class="canvas-wrapper">
           <canvas id="piano-roll"></canvas>
         </div>
-        <button id="export-open-btn" class="btn btn-export">비디오/오디오 내보내기</button>
       </div>
     </div>
   </main>
-
-  <!-- Export Modal -->
-  <div id="export-modal">
-    <div class="modal-content">
-      <div id="export-step-1">
-        <h2 class="modal-title">Export Project</h2>
-        <p class="modal-desc">내보낼 파일 형식을 선택하세요.</p>
-        <div class="export-options">
-          <button id="save-mp4-btn" class="btn btn-primary">.mp4 비디오로 저장</button>
-          <button id="save-mp3-btn" class="btn btn-secondary">.mp3 오디오로 저장</button>
-          <button id="close-modal-btn" class="btn btn-secondary">닫기</button>
-        </div>
-      </div>
-
-      <div id="export-step-progress" style="display: none;">
-        <h2 class="modal-title">Rendering...</h2>
-        <p class="modal-desc">작품을 구워내고 있습니다. 잠시만 기다려주세요.</p>
-        <div class="progress-container" style="display: block;">
-          <div class="progress-bar-bg">
-            <div id="progress-fill"></div>
-          </div>
-          <span class="progress-text">Encoding: <span id="progress-percent">0</span>%</span>
-          <button id="cancel-export-btn" class="btn btn-danger">취소</button>
-        </div>
-      </div>
-
-      <div id="export-step-finish" style="display: none;">
-        <h2 class="modal-title">Done!</h2>
-        <p class="modal-desc">렌더링이 완료되었습니다.</p>
-        <div class="finish-options" style="display: flex;">
-          <button id="download-btn" class="btn btn-primary">다운로드</button>
-          <button id="back-to-step1-btn" class="btn btn-secondary">이전 화면으로</button>
-          <button id="final-close-btn" class="btn btn-secondary">취소 및 닫기</button>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
   <script src="https://unpkg.com/@tonejs/midi"></script>
@@ -400,11 +328,7 @@
       currentFlipY: 1,
       midiLoaded: false, 
       mediaLoaded: false,
-      activeNotes: new Set(),
-      exportProgress: 0,
-      exportInterval: null,
-      lastExportType: '',
-      generatedBlob: null
+      activeNotes: new Set()
     };
 
     const EL = {
@@ -424,22 +348,7 @@
       statusDot: $('status-dot'),
       inAnim: $('in-anim-select'),
       outAnim: $('out-anim-select'),
-      hexBg: $('hex-bg-input'),
-      // Modal Elements
-      modal: $('export-modal'),
-      exportOpen: $('export-open-btn'),
-      closeModal: $('close-modal-btn'),
-      saveMp4: $('save-mp4-btn'),
-      saveMp3: $('save-mp3-btn'),
-      progressFill: $('progress-fill'),
-      progressPercent: $('progress-percent'),
-      cancelExport: $('cancel-export-btn'),
-      download: $('download-btn'),
-      backStep1: $('back-to-step1-btn'),
-      finalClose: $('final-close-btn'),
-      step1: $('export-step-1'),
-      stepProgress: $('export-step-progress'),
-      stepFinish: $('export-step-finish')
+      hexBg: $('hex-bg-input')
     };
 
     function setStatus(msg, active = false) {
@@ -448,71 +357,14 @@
       else EL.statusDot.classList.remove('active');
     }
 
-    // Modal Logic
-    EL.exportOpen.addEventListener('click', () => {
-      if(!APP.midiLoaded || !APP.mediaLoaded) {
-        alert("파일을 먼저 업로드 해주세요!");
-        return;
+    EL.hexBg.addEventListener('input', (e) => {
+      const color = e.target.value.trim();
+      if (/^#([0-9A-F]{3}){1,2}$/i.test(color)) {
+        EL.vidBg.style.backgroundColor = color;
+        EL.viewport.style.backgroundColor = color;
       }
-      showStep(1);
-      EL.modal.style.display = 'flex';
     });
 
-    function showStep(step) {
-      EL.step1.style.display = step === 1 ? 'block' : 'none';
-      EL.stepProgress.style.display = step === 2 ? 'block' : 'none';
-      EL.stepFinish.style.display = step === 3 ? 'block' : 'none';
-    }
-
-    EL.closeModal.onclick = () => EL.modal.style.display = 'none';
-    EL.finalClose.onclick = () => EL.modal.style.display = 'none';
-    
-    EL.backStep1.onclick = () => showStep(1);
-
-    EL.saveMp4.onclick = () => startExport('mp4');
-    EL.saveMp3.onclick = () => startExport('mp3');
-
-    function startExport(type) {
-      APP.lastExportType = type;
-      APP.exportProgress = 0;
-      showStep(2);
-      
-      const duration = APP.midi.duration * 1000; // ms
-      const stepTime = Math.max(duration / 100, 20); // 최소 속도 보장
-
-      APP.exportInterval = setInterval(() => {
-        APP.exportProgress += 1;
-        EL.progressFill.style.width = APP.exportProgress + '%';
-        EL.progressPercent.innerText = APP.exportProgress;
-
-        if (APP.exportProgress >= 100) {
-          clearInterval(APP.exportInterval);
-          // 가짜 파일 생성
-          const dummyContent = new Uint8Array([1, 2, 3]);
-          APP.generatedBlob = new Blob([dummyContent], { type: type === 'mp4' ? 'video/mp4' : 'audio/mpeg' });
-          showStep(3);
-        }
-      }, stepTime / 5); // 렌더링 체감을 위해 약간 빠르게
-    }
-
-    EL.cancelExport.onclick = () => {
-      clearInterval(APP.exportInterval);
-      showStep(1);
-    };
-
-    EL.download.onclick = () => {
-      if (!APP.generatedBlob) return;
-      const url = URL.createObjectURL(APP.generatedBlob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `zorius_export_${Date.now()}.${APP.lastExportType}`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    };
-
-    // MIDI & Media Logic
     async function handleMidi(file) {
       if (!file) return;
       try {
@@ -522,7 +374,9 @@
         $('midi-label').textContent = `✓ MIDI: ${file.name}`;
         EL.midiZone.classList.add('loaded');
         checkReady();
-      } catch (e) { setStatus('MIDI 오류'); }
+      } catch (e) {
+        setStatus('MIDI 파일 형식 오류');
+      }
     }
 
     async function handleMedia(file) {
@@ -531,24 +385,27 @@
         const url = URL.createObjectURL(file);
         EL.video.src = url;
         EL.video.load();
+
         const arrayBuffer = await file.arrayBuffer();
         if (APP.sampler) APP.sampler.dispose();
         APP.sampler = new Tone.Sampler({
           urls: { C4: url },
           onload: () => {
             APP.mediaLoaded = true;
-            $('media-label').textContent = `✓ 미디어: ${file.name}`;
+            $('media-label').textContent = `✓ 샘플 로드 완료: ${file.name}`;
             EL.mediaZone.classList.add('loaded');
             checkReady();
           }
         }).toDestination();
-      } catch (e) { setStatus('미디어 오류'); }
+      } catch (e) {
+        setStatus('미디어 파일 처리 오류');
+      }
     }
 
     function checkReady() {
       if (APP.midiLoaded && APP.mediaLoaded) {
         EL.playBtn.disabled = false;
-        setStatus('준비 완료!');
+        setStatus('준비 완료! 퍼포먼스 대기 중');
       }
     }
 
@@ -558,100 +415,155 @@
       EL.video.style.setProperty('--sy', APP.currentFlipY);
     }
 
-    function executeTrigger(note) {
+    function executeTrigger(time, note) {
       Tone.Transport.schedule((t) => {
         Tone.Draw.schedule(() => {
           APP.activeNotes.add(note.midi);
+          
           EL.video.currentTime = 0;
           EL.video.play().catch(() => {});
           EL.video.style.opacity = "1";
-          if (APP.isFlipHMode) APP.currentFlipX *= -1;
-          if (APP.isFlipVMode) APP.currentFlipY *= -1;
+
+          if (APP.isFlipHMode) {
+            APP.currentFlipX = (APP.currentFlipX === 1) ? -1 : 1;
+          } else {
+            APP.currentFlipX = 1;
+          }
+
+          if (APP.isFlipVMode) {
+            APP.currentFlipY = (APP.currentFlipY === 1) ? -1 : 1;
+          } else {
+            APP.currentFlipY = 1;
+          }
+          
           applyTransform();
+
           if (EL.inAnim.value === 'pop') {
             EL.video.classList.remove('anim-pop');
             void EL.video.offsetWidth; 
             EL.video.classList.add('anim-pop');
           }
+
           EL.statusDot.classList.add('trigger');
           setTimeout(() => EL.statusDot.classList.remove('trigger'), 50);
         }, t);
+
         if (APP.sampler) APP.sampler.triggerAttack(note.name, t);
       }, note.time);
 
       Tone.Transport.schedule((t) => {
         Tone.Draw.schedule(() => {
           APP.activeNotes.delete(note.midi);
-          if (APP.isPlaying && APP.activeNotes.size === 0 && EL.outAnim.value === 'fade') {
-            EL.video.style.opacity = "0";
+          
+          if (APP.isPlaying && APP.activeNotes.size === 0) {
+            if (EL.outAnim.value === 'fade') {
+              EL.video.style.opacity = "0";
+            }
           }
         }, t);
         if (APP.sampler) APP.sampler.triggerRelease(note.name, t);
       }, note.time + note.duration);
     }
 
-    EL.playBtn.onclick = async () => {
+    async function setupPlayback() {
+      Tone.Transport.cancel();
+      APP.activeNotes.clear();
+      APP.midi.tracks.forEach(track => {
+        track.notes.forEach(note => {
+          executeTrigger(note.time, note);
+        });
+      });
+    }
+
+    EL.playBtn.addEventListener('click', async () => {
       if (APP.isPlaying) {
         Tone.Transport.stop();
         EL.video.pause();
+        EL.video.style.opacity = "1"; 
         APP.isPlaying = false;
         EL.playBtn.textContent = '재생';
+        setStatus('일시 정지됨', true);
       } else {
         await Tone.start();
-        Tone.Transport.cancel();
-        APP.midi.tracks.forEach(track => track.notes.forEach(executeTrigger));
+        await setupPlayback();
         Tone.Transport.start();
         APP.isPlaying = true;
         EL.playBtn.textContent = '정지';
+        setStatus('라이브 퍼포먼스 중...', true);
       }
-    };
+    });
 
-    EL.flipHBtn.onclick = () => {
+    EL.flipHBtn.addEventListener('click', () => {
       APP.isFlipHMode = !APP.isFlipHMode;
       EL.flipHBtn.classList.toggle('active', APP.isFlipHMode);
-      if (!APP.isFlipHMode) { APP.currentFlipX = 1; applyTransform(); }
-    };
+      if (!APP.isFlipHMode) {
+        APP.currentFlipX = 1;
+        applyTransform();
+      }
+    });
 
-    EL.flipVBtn.onclick = () => {
+    EL.flipVBtn.addEventListener('click', () => {
       APP.isFlipVMode = !APP.isFlipVMode;
       EL.flipVBtn.classList.toggle('active', APP.isFlipVMode);
-      if (!APP.isFlipVMode) { APP.currentFlipY = 1; applyTransform(); }
-    };
+      if (!APP.isFlipVMode) {
+        APP.currentFlipY = 1;
+        applyTransform();
+      }
+    });
 
     const initDropZone = (zone, input, handler) => {
-      zone.ondragover = e => { e.preventDefault(); zone.classList.add('dragover'); };
-      zone.ondragleave = () => zone.classList.remove('dragover');
-      zone.ondrop = e => { e.preventDefault(); zone.classList.remove('dragover'); handler(e.dataTransfer.files[0]); };
-      input.onchange = e => handler(e.target.files[0]);
+      zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('dragover'); });
+      zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+      zone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        zone.classList.remove('dragover');
+        if (e.dataTransfer.files.length) handler(e.dataTransfer.files[0]);
+      });
+      input.addEventListener('change', (e) => {
+        if (e.target.files.length) handler(e.target.files[0]);
+      });
     };
 
     initDropZone(EL.midiZone, EL.midiInput, handleMidi);
     initDropZone(EL.mediaZone, EL.mediaInput, handleMedia);
 
-    function renderRoll() {
+    function resizeCanvas() {
+      const wrapper = EL.canvas.parentElement;
+      EL.canvas.width = wrapper.clientWidth;
+      EL.canvas.height = wrapper.clientHeight;
+    }
+
+    function render() {
       if (APP.isPlaying && APP.midi) {
         const time = Tone.Transport.seconds;
         EL.ctx.clearRect(0, 0, EL.canvas.width, EL.canvas.height);
+        
         EL.ctx.strokeStyle = 'rgba(108, 77, 246, 0.3)';
-        EL.ctx.beginPath(); EL.ctx.moveTo(EL.canvas.width/4, 0); EL.ctx.lineTo(EL.canvas.width/4, EL.canvas.height); EL.ctx.stroke();
+        EL.ctx.lineWidth = 1;
+        EL.ctx.beginPath();
+        EL.ctx.moveTo(EL.canvas.width / 4, 0);
+        EL.ctx.lineTo(EL.canvas.width / 4, EL.canvas.height);
+        EL.ctx.stroke();
+
         APP.midi.tracks.forEach(track => {
           track.notes.forEach(note => {
             const x = (note.time - time) * 100 + (EL.canvas.width / 4);
             const y = EL.canvas.height - (note.midi % 48) * (EL.canvas.height / 48);
-            if (x + 30 > 0 && x < EL.canvas.width) {
-              EL.ctx.fillStyle = note.time <= time && note.time + note.duration >= time ? 'var(--accent2)' : '#FFF';
+            const w = note.duration * 100;
+            
+            if (x + w > 0 && x < EL.canvas.width) {
+              EL.ctx.fillStyle = note.time <= time && note.time + note.duration >= time ? 'var(--accent2)' : '#FFFFFF';
               EL.ctx.fillRect(x, y, 30, 4);
             }
           });
         });
       }
-      requestAnimationFrame(renderRoll);
+      requestAnimationFrame(render);
     }
-    window.onresize = () => {
-      EL.canvas.width = EL.canvas.parentElement.clientWidth;
-      EL.canvas.height = EL.canvas.parentElement.clientHeight;
-    };
-    window.onresize(); renderRoll();
+
+    window.addEventListener('resize', resizeCanvas);
+    setTimeout(resizeCanvas, 100);
+    render();
   </script>
 </body>
 </html>
