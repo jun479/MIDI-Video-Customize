@@ -2,9 +2,15 @@
 > $\color{#2ea44f}{\textsf{\textbf{이제 미디 파일과 비디오만 준비하세요!}}}$
 > > https://midi-video-customize.vercel.app/
 
-`리퍼 스크립트`는 미디 파일을 못 읽기 때문에 날먹이 불가능 했지만 이 사이트에서는 상상을 초월하는 날먹을 해보세요!
-
-
+기존 DAW 기반 작업보다 더 간단하게 MIDI와 영상을 활용할 수 있습니다.
+> [!NOTE]
+> 사용자가 업로드한 MIDI, 오디오, 비디오 파일은 서버로 전송되지 않으며 브라우저에서만 처리됩니다.
+> 
+> 이 사이트를 사용해 생성된 영상 및 결과물은 자유롭게 녹화, 편집, 업로드 및 공유할 수 있습니다.
+> 본 사이트 출처 표기는 필요하지 않습니다.
+> 
+> 단, 사용자가 업로드한 MIDI, 오디오, 영상 파일의 저작권은 해당 파일의 원 저작자에게 있으며,
+> 해당 콘텐츠 사용에 대한 책임은 사용자에게 있습니다.
 
 ## 👉주요 기능
 MIDI 파싱 + 피아노롤 표시
@@ -13,7 +19,7 @@ MIDI 파싱 + 피아노롤 표시
 
 영상 제어 - 좌우 반전 & 상하 반전(*실험적*) 
 
-비디오/오디오 내보내기 기능(MediaRecorder)
+오디오(WAV) 내보내기 기능
 
 영상에 페이드 아웃/팝 등등 효과를 적용하는 기능
 
@@ -46,7 +52,3 @@ MIDI Editor 기능으로 노트를 수정할 수 있습니다.
 | :---: | :---: |
 | [![[MIDI-Video-Freeloading] If I Had a Chicken](http://img.youtube.com/vi/rWlk1PyKd9U/0.jpg)](https://youtu.be/rWlk1PyKd9U?t=0s)  | [![[MIDI-Video-Freeloading] If I Had a Chicken](http://img.youtube.com/vi/g1iHDYwgY7A/0.jpg)](https://youtu.be/g1iHDYwgY7A?t=0s) |
 | https://www.youtube.com/watch?v=rWlk1PyKd9U | https://www.youtube.com/watch?v=g1iHDYwgY7A |
-
-
-
-
