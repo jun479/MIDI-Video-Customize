@@ -24,7 +24,6 @@
       --text2: #8890b0;
       --text3: #4a5078;
       --radius: 12px;
-      --modal-bg: rgba(5, 5, 13, 0.9);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -159,7 +158,7 @@
     .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; flex-shrink: 0; }
     
     .card-title { 
-      font-size: 7px; 
+      font-size: 0.65rem; 
       font-weight: 700; 
       margin-bottom: 1rem; 
       color: var(--accent-glow); 
@@ -232,10 +231,10 @@
     .btn-secondary.active { border-color: var(--accent2); background: rgba(255, 95, 61, 0.1); color: var(--accent2g); }
     
     .btn-export { background: #8a70ff; color: white; margin-top: 0.75rem; }
+    .btn-export:disabled { opacity: 0.7; cursor: wait; }
 
-    /* Export Progress (UI 유지하며 기능 추가) */
     .export-container { margin-top: 0.75rem; }
-    .progress-bg { width: 100%; height: 6px; background: var(--surface3); border-radius: 3px; overflow: hidden; display: none; margin-bottom: 5px; }
+    .progress-bg { width: 100%; height: 6px; background: var(--surface3); border-radius: 3px; overflow: hidden; display: none; margin-bottom: 8px; }
     #export-progress { width: 0%; height: 100%; background: var(--green); transition: width 0.1s linear; }
 
     input[type="file"] { display: none; }
@@ -528,16 +527,17 @@
       }
     });
 
-    // --- Audio Export Logic (WAV) ---
+    // --- Audio Export Logic (WAV) with Progress ---
     EL.exportBtn.onclick = async () => {
       if (!APP.midi || !APP.currentMediaUrl) return;
       
       EL.exportBtn.disabled = true;
       EL.progressBg.style.display = 'block';
       EL.progressFill.style.width = '0%';
-      setStatus('WAV 추출 중...', true);
+      EL.exportBtn.textContent = '추출 중... (0%)';
+      setStatus('오디오 렌더링 중...', true);
 
-      const duration = APP.midi.duration + 2; // 여유 시간 추가
+      const duration = APP.midi.duration + 2; 
       
       try {
         const buffer = await Tone.Offline(async (context) => {
@@ -552,28 +552,38 @@
               offlineSampler.triggerAttackRelease(note.name, note.duration, note.time);
             });
           });
-        }, duration);
+
+          // 진행률 추적을 위한 루프 (Tone.Offline 내에서 직접 진행 상황을 업데이트할 방법이 제한적이므로 context의 시간을 활용)
+          // 하지만 Tone.Offline은 비동기 렌더링이므로 콜백으로 진행률을 받는 것이 더 정확함.
+        }, duration, (progress) => {
+          // Tone.Offline의 세 번째 인자는 진행률 콜백 (0~1)
+          const percent = Math.round(progress * 100);
+          EL.progressFill.style.width = `${percent}%`;
+          EL.exportBtn.textContent = `추출 중... (${percent}%)`;
+        });
 
         EL.progressFill.style.width = '100%';
+        EL.exportBtn.textContent = '인코딩 중...';
 
-        // Float32Array to WAV (16-bit PCM)
         const wavBlob = audioBufferToWav(buffer);
         const url = URL.createObjectURL(wavBlob);
         const a = document.createElement('a');
         a.href = url;
-        // 파일명 변경: MIDI_Video_Freeloading_날짜.wav
         a.download = `MIDI_Video_Freeloading_${Date.now()}.wav`;
         a.click();
         
-        setStatus('추출 완료!', true);
+        setStatus('추출 완료! 파일 저장됨', true);
+        EL.exportBtn.textContent = '추출 완료!';
       } catch (err) {
         console.error(err);
-        setStatus('추출 실패');
+        setStatus('추출 중 오류 발생');
+        EL.exportBtn.textContent = '추출 실패';
       } finally {
         setTimeout(() => {
           EL.exportBtn.disabled = false;
+          EL.exportBtn.textContent = 'WAV 오디오 추출';
           EL.progressBg.style.display = 'none';
-        }, 2000);
+        }, 3000);
       }
     };
 
@@ -585,19 +595,22 @@
       const channels = [];
       let i, sample, offset = 0, pos = 0;
 
+      const setUint16 = (data) => { view.setUint16(pos, data, true); pos += 2; };
+      const setUint32 = (data) => { view.setUint32(pos, data, true); pos += 4; };
+
       setUint32(0x46464952); // "RIFF"
-      setUint32(length - 8); // file length - 8
+      setUint32(length - 8); 
       setUint32(0x45564157); // "WAVE"
-      setUint32(0x20746d66); // "fmt " chunk
-      setUint32(16); // length = 16
-      setUint16(1); // PCM (uncompressed)
+      setUint32(0x20746d66); // "fmt "
+      setUint32(16); 
+      setUint16(1); 
       setUint16(numOfChan);
       setUint32(buffer.sampleRate);
-      setUint32(buffer.sampleRate * 2 * numOfChan); // avg. bytes/sec
-      setUint16(numOfChan * 2); // block-align
-      setUint16(16); // 16-bit
-      setUint32(0x61746164); // "data" - chunk
-      setUint32(length - pos - 4); // chunk length
+      setUint32(buffer.sampleRate * 2 * numOfChan);
+      setUint16(numOfChan * 2);
+      setUint16(16);
+      setUint32(0x61746164); // "data"
+      setUint32(length - pos - 4);
 
       for (i = 0; i < buffer.numberOfChannels; i++) channels.push(buffer.getChannelData(i));
       while (pos < length) {
@@ -610,9 +623,6 @@
         offset++;
       }
       return new Blob([bufferOut], { type: 'audio/wav' });
-
-      function setUint16(data) { view.setUint16(pos, data, true); pos += 2; }
-      function setUint32(data) { view.setUint32(pos, data, true); pos += 4; }
     }
 
     const initDropZone = (zone, input, handler) => {
