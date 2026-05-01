@@ -51,7 +51,7 @@
 
     .title-area {
       display: flex;
-      flex-direction: column; /* 공지사항 추가를 위해 컬럼 방향으로 설정 */
+      flex-direction: column;
       justify-content: center;
       flex: 1;
     }
@@ -64,7 +64,7 @@
       margin: 0;
     }
 
-    /* 공지사항 스타일링 */
+    /* --- 공지사항 섹션 --- */
     .notice-section {
       margin-top: 4px;
       font-size: 0.8rem;
@@ -79,28 +79,42 @@
       margin-bottom: 2px;
     }
 
-    .full-notice-details {
-      cursor: pointer;
-      outline: none;
-    }
-
-    .full-notice-details summary {
-      font-size: 0.75rem;
-      color: var(--accent-glow);
-      list-style: none;
-      display: inline-block;
-    }
-
-    .full-notice-details summary::-webkit-details-marker {
-      display: none;
-    }
-
-    .full-notice-content {
-      margin-top: 4px;
+    /* PC 화면 설정: 상세 내용을 평문으로 노출 */
+    .full-notice-desktop {
+      display: block;
       font-size: 0.75rem;
       color: #aaa;
       white-space: pre-line;
-      max-width: 800px;
+      max-width: 900px;
+    }
+
+    /* 모바일 화면용 details 숨김 (기본) */
+    .full-notice-mobile {
+      display: none;
+    }
+
+    /* 반응형 제어 */
+    @media (max-width: 768px) {
+      .full-notice-desktop {
+        display: none; /* PC용 평문 숨김 */
+      }
+      .full-notice-mobile {
+        display: block; /* 모바일용 details 노출 */
+      }
+      .full-notice-mobile summary {
+        font-size: 0.75rem;
+        color: var(--accent-glow);
+        cursor: pointer;
+        list-style: none;
+        outline: none;
+      }
+      .full-notice-mobile summary::-webkit-details-marker { display: none; }
+      .full-notice-content {
+        margin-top: 4px;
+        font-size: 0.75rem;
+        color: #aaa;
+        white-space: pre-line;
+      }
     }
 
     .header-controls {
@@ -301,7 +315,14 @@
       <h1 class="main-title">MIDI Video <span style="color: var(--accent);">Freeloading</span></h1>
       <div class="notice-section">
         <span class="short-notice">출처 표기는 불필요하나, 업로드한 원본 파일의 저작권 및 사용 책임은 사용자에게 있습니다.</span>
-        <details id="notice-details" class="full-notice-details">
+        
+        <!-- PC용: 버튼 없이 바로 노출 -->
+        <div class="full-notice-desktop">
+          사용자가 업로드한 파일은 브라우저에서만 처리됩니다. 결과물은 자유롭게 사용 가능하나 파일의 저작권 및 사용 책임은 사용자에게 있습니다.
+        </div>
+
+        <!-- 모바일용: 자세히 보기 버튼 적용 -->
+        <details class="full-notice-mobile">
           <summary>자세히 보기</summary>
           <div class="full-notice-content">
             사용자가 업로드한 MIDI, 오디오, 비디오 파일은 서버로 전송되지 않으며 브라우저에서만 처리됩니다.
@@ -410,18 +431,8 @@
       statusText: $('status-text'), statusDot: $('status-dot'),
       inAnim: $('in-anim-select'), outAnim: $('out-anim-select'),
       hexBg: $('hex-bg-input'), exportBtn: $('export-audio-btn'),
-      progressBg: $('progress-bg'), progressFill: $('export-progress'),
-      noticeDetails: $('notice-details')
+      progressBg: $('progress-bg'), progressFill: $('export-progress')
     };
-
-    // 장치 기반 공지사항 상태 제어
-    function initNotice() {
-      if (window.innerWidth > 768) {
-        EL.noticeDetails.open = true;
-      } else {
-        EL.noticeDetails.open = false;
-      }
-    }
 
     function setStatus(msg, active = false) {
       EL.statusText.textContent = msg;
@@ -633,15 +644,8 @@
       requestAnimationFrame(render);
     }
 
-    window.onload = () => {
-      initNotice();
-      resizeCanvas();
-      render();
-    };
-    window.onresize = () => {
-      initNotice();
-      resizeCanvas();
-    };
+    window.onload = () => { resizeCanvas(); render(); };
+    window.onresize = () => { resizeCanvas(); };
   </script>
 </body>
 </html>
