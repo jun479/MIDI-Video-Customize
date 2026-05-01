@@ -1,5 +1,5 @@
 # MIDI-Video-Freeloading
-> $\color{#adff2f}{\text{이제 미디 파일과 비디오만 준비하세요!}}$
+> $\color{#2ea44f}{\textsf{\textbf{이제 미디 파일과 비디오만 준비하세요!}}}$
 > > https://midi-video-customize.vercel.app/
 
 `리퍼 스크립트`는 미디 파일을 못 읽기 때문에 날먹이 불가능 했지만 이 사이트에서는 상상을 초월하는 날먹을 해보세요!
@@ -25,7 +25,7 @@ MIDI 파싱 + 피아노롤 표시
 ## 👉미디 사이트 추천
 | https://bitmidi.com | https://basicpitch.spotify.com | https://eldoraudio.com |
 | :--- | :---- | :--- |
-| $\color{#adff2f}{\text{회원가입X}}$ $\color{#bfff00}{\text{무료}}$ | $\color{#adff2f}{\text{회원가입X}}$ $\color{#bfff00}{\text{무료}}$ | $\color{#adff2f}{\text{회원가입X}}$ $\color{#bfff00}{\text{무료}}$ |
+| $\color{#00a67d}{\text{회원가입X}}$ $\color{#bfff00}{\text{무료}}$ | $\color{#00a67d}{\text{회원가입X}}$ $\color{#bfff00}{\text{무료}}$ | $\color{#00a67d}{\text{회원가입X}}$ $\color{#bfff00}{\text{무료}}$ |
 | 많은 미디 파일이 저장되어있는 사이트입니다. | 오디오를 미디로 변환하는 사이트입니다. | 유튜브에서 피아노 커버 영상을 찾고, 그걸 이 사이트에 넣으면 깔끔한 미디를 만들어주는 사이트 입니다. |
 
 > [!TIP]
