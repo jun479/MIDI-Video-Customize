@@ -23,7 +23,7 @@
       --text: #dde0f0;
       --text2: #8890b0;
       --text3: #4a5078;
-      --radius: 12px; /* 라운드 디자인 롤백 완료! */
+      --radius: 12px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -133,7 +133,16 @@
       max-height: 100%;
       object-fit: contain; 
       transform-origin: center;
-      transition: opacity 0.1s, transform 0.1s;
+      transition: opacity 0.2s; /* 부드러운 페이드 아웃 */
+      opacity: 0; /* 기본은 숨김 */
+    }
+
+    /* 애니메이션 클래스 */
+    .anim-pop { animation: pop-effect 0.1s ease-out; }
+    @keyframes pop-effect {
+      0% { transform: scale(0.95) scaleX(var(--sx, 1)); }
+      50% { transform: scale(1.05) scaleX(var(--sx, 1)); }
+      100% { transform: scale(1) scaleX(var(--sx, 1)); }
     }
 
     .sidebar { 
@@ -222,9 +231,6 @@
     .btn-secondary.active { border-color: var(--accent2); background: rgba(255, 95, 61, 0.1); color: var(--accent2g); }
 
     input[type="file"] { display: none; }
-
-    .anim-pop { transform: scale(1.05); }
-    .anim-fade-out { opacity: 0; }
   </style>
 </head>
 <body>
@@ -395,26 +401,34 @@
       }
     }
 
+    // 트리거 로직 대수술
     function executeTrigger(time, note) {
+      // NOTE ON
       Tone.Transport.schedule((t) => {
         Tone.Draw.schedule(() => {
           APP.activeNotes.add(note.midi);
+          
+          // 영상 재생
           EL.video.currentTime = 0;
           EL.video.play().catch(() => {});
-          
-          EL.video.classList.remove('anim-fade-out');
           EL.video.style.opacity = "1";
-          
-          if (EL.inAnim.value === 'pop') {
-            EL.video.classList.add('anim-pop');
-            setTimeout(() => EL.video.classList.remove('anim-pop'), 50);
-          }
 
+          // 좌우 반전 적용
           if (APP.isFlipMode) {
-            APP.currentFlip = APP.currentFlip === 1 ? -1 : 1;
-            EL.video.style.transform = `scaleX(${APP.currentFlip})`;
+            APP.currentFlip = (APP.currentFlip === 1) ? -1 : 1;
           } else {
-            EL.video.style.transform = `scaleX(1)`;
+            APP.currentFlip = 1;
+          }
+          
+          // 애니메이션 CSS 변수 업데이트
+          EL.video.style.setProperty('--sx', APP.currentFlip);
+          EL.video.style.transform = `scaleX(${APP.currentFlip})`;
+
+          // 인 애니메이션 (Pop)
+          if (EL.inAnim.value === 'pop') {
+            EL.video.classList.remove('anim-pop');
+            void EL.video.offsetWidth; // Reflow 트리거
+            EL.video.classList.add('anim-pop');
           }
 
           EL.statusDot.classList.add('trigger');
@@ -424,12 +438,15 @@
         if (APP.sampler) APP.sampler.triggerAttack(note.name, t);
       }, note.time);
 
+      // NOTE OFF
       Tone.Transport.schedule((t) => {
         Tone.Draw.schedule(() => {
           APP.activeNotes.delete(note.midi);
+          
+          // 모든 노트가 끝났을 때만 아웃 애니메이션 실행
           if (APP.activeNotes.size === 0) {
             if (EL.outAnim.value === 'fade') {
-              EL.video.classList.add('anim-fade-out');
+              EL.video.style.opacity = "0";
             }
           }
         }, t);
@@ -451,6 +468,7 @@
       if (APP.isPlaying) {
         Tone.Transport.stop();
         EL.video.pause();
+        EL.video.style.opacity = "0";
         APP.isPlaying = false;
         EL.playBtn.textContent = '재생';
         setStatus('일시 정지됨', true);
@@ -467,7 +485,10 @@
     EL.flipBtn.addEventListener('click', () => {
       APP.isFlipMode = !APP.isFlipMode;
       EL.flipBtn.classList.toggle('active', APP.isFlipMode);
-      if (!APP.isFlipMode) EL.video.style.transform = 'scaleX(1)';
+      if (!APP.isFlipMode) {
+        APP.currentFlip = 1;
+        EL.video.style.transform = 'scaleX(1)';
+      }
     });
 
     const initDropZone = (zone, input, handler) => {
