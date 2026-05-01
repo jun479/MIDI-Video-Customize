@@ -45,12 +45,12 @@
       background: rgba(5, 5, 13, 0.9);
       border-bottom: 1px solid var(--border);
       z-index: 100;
-      height: 64px; /* 헤더 높이 고정 */
+      height: 64px;
     }
 
     .title-group {
       display: flex;
-      align-items: center; /* 옆으로 배치 */
+      align-items: center;
       gap: 1rem;
       flex: 1;
       overflow: hidden;
@@ -78,54 +78,26 @@
       text-overflow: ellipsis;
     }
 
-    /* 공통 공지사항 상세 스타일 */
-    .notice-detail {
-      position: relative;
-    }
-
-    .notice-detail summary {
+    /* 자세히 보기 버튼 스타일 */
+    .notice-btn {
       font-size: 0.7rem;
       color: var(--accent-glow);
       cursor: pointer;
-      list-style: none;
       padding: 4px 10px;
       background: var(--surface2);
       border: 1px solid var(--border2);
       border-radius: 4px;
       transition: all 0.2s;
+      font-family: inherit;
     }
-    .notice-detail summary:hover {
+    .notice-btn:hover {
       background: var(--surface3);
       border-color: var(--accent);
-    }
-    .notice-detail summary::-webkit-details-marker { display: none; }
-    
-    .notice-content {
-      position: absolute;
-      top: 35px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 280px;
-      background: var(--surface3);
-      padding: 1rem;
-      border-radius: 8px;
-      border: 1px solid var(--accent);
-      white-space: normal;
-      z-index: 200;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-      font-size: 0.75rem;
-      color: #ddd;
-      line-height: 1.5;
+      color: white;
     }
 
-    /* 모바일에서는 텍스트 숨기고 버튼만 강조 */
     @media (max-width: 768px) {
       .notice-text { display: none; }
-      .notice-content {
-        left: auto;
-        right: -50px;
-        transform: none;
-      }
     }
 
     .header-controls {
@@ -253,16 +225,7 @@
       
       <div class="notice-section">
         <span class="notice-text">출처 표기 불필요 · 원본 저작권 책임은 사용자에게 있음</span>
-        
-        <!-- PC/모바일 통합 상세 버튼 -->
-        <details class="notice-detail">
-          <summary>자세히 보기</summary>
-          <div class="notice-content">
-            본 사이트를 통해 생성된 결과물은 자유롭게 사용 가능하며 출처 표기는 불필요합니다. 
-            단, 업로드한 파일의 저작권 및 사용 책임은 전적으로 사용자에게 있습니다. 
-            모든 처리는 브라우저에서 이루어지며 파일은 서버로 전송되지 않습니다.
-          </div>
-        </details>
+        <button class="notice-btn" id="notice-btn">자세히 보기</button>
       </div>
     </div>
 
@@ -320,7 +283,15 @@
   <script>
     const $ = id => document.getElementById(id);
     const APP = { midi: null, sampler: null, isPlaying: false, currentFlipX: 1, currentFlipY: 1, isFlipHMode: false, isFlipVMode: false, midiLoaded: false, mediaLoaded: false, activeNotes: new Set(), currentMediaUrl: null };
-    const EL = { video: $('main-video'), vidBg: $('vid-bg'), viewport: $('viewport'), canvas: $('piano-roll'), ctx: $('piano-roll').getContext('2d'), playBtn: $('play-btn'), flipHBtn: $('flip-h-btn'), flipVBtn: $('flip-v-btn'), midiZone: $('midi-zone'), mediaZone: $('media-zone'), midiInput: $('midi-input'), mediaInput: $('media-input'), statusText: $('status-text'), statusDot: $('status-dot'), inAnim: $('in-anim-select'), outAnim: $('out-anim-select'), hexBg: $('hex-bg-input'), exportBtn: $('export-audio-btn'), progressBg: $('progress-bg'), progressFill: $('export-progress') };
+    const EL = { video: $('main-video'), vidBg: $('vid-bg'), viewport: $('viewport'), canvas: $('piano-roll'), ctx: $('piano-roll').getContext('2d'), playBtn: $('play-btn'), flipHBtn: $('flip-h-btn'), flipVBtn: $('flip-v-btn'), midiZone: $('midi-zone'), mediaZone: $('media-zone'), midiInput: $('midi-input'), mediaInput: $('media-input'), statusText: $('status-text'), statusDot: $('status-dot'), inAnim: $('in-anim-select'), outAnim: $('out-anim-select'), hexBg: $('hex-bg-input'), exportBtn: $('export-audio-btn'), progressBg: $('progress-bg'), progressFill: $('export-progress'), noticeBtn: $('notice-btn') };
+
+    // 자세히 보기 팝업 핸들러
+    EL.noticeBtn.onclick = () => {
+      const msg = "본 사이트를 통해 생성된 결과물은 자유롭게 사용 가능하며 출처 표기는 불필요합니다.\n\n" +
+                  "단, 업로드한 파일의 저작권 및 사용 책임은 전적으로 사용자에게 있습니다.\n" +
+                  "모든 처리는 브라우저에서 실시간으로 이루어지며, 파일은 서버로 전송되지 않습니다.";
+      alert(msg);
+    };
 
     function setStatus(msg, active = false) { EL.statusText.textContent = msg; if (active) EL.statusDot.classList.add('active'); else EL.statusDot.classList.remove('active'); }
     EL.hexBg.oninput = e => { if (/^#([0-9A-F]{3}){1,2}$/i.test(e.target.value)) EL.vidBg.style.backgroundColor = EL.viewport.style.backgroundColor = e.target.value; };
