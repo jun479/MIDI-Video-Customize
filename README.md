@@ -51,7 +51,7 @@ MIDI Editor 기능으로 노트를 수정할 수 있습니다.
 
 
 ## 🙋예시
-| 첫 번째 영상 | 두 번째 영상(다른 영상 입니다) |
+| 첫 번째 영상 | 두 번째 영상 |
 | :---: | :---: |
-| [![[MIDI-Video-Freeloading] If I Had a Chicken](http://img.youtube.com/vi/rWlk1PyKd9U/0.jpg)](https://youtu.be/rWlk1PyKd9U?t=0s)  | [![[MIDI-Video-Freeloading] If I Had a Chicken](http://img.youtube.com/vi/g1iHDYwgY7A/0.jpg)](https://youtu.be/g1iHDYwgY7A?t=0s) |
+| [![[MIDI-Video-Freeloading 예시] Rainbow Tylenol](http://img.youtube.com/vi/X7b5QV6hYSk/0.jpg)](https://youtu.be/X7b5QV6hYSk?t=0s)  | [![[MIDI-Video-Freeloading] If I Had a Chicken](http://img.youtube.com/vi/g1iHDYwgY7A/0.jpg)](https://youtu.be/g1iHDYwgY7A?t=0s) |
 | https://www.youtube.com/watch?v=rWlk1PyKd9U | https://www.youtube.com/watch?v=g1iHDYwgY7A |
