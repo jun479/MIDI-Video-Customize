@@ -63,7 +63,6 @@
       white-space: nowrap;
     }
 
-    /* --- 공지사항 섹션 --- */
     .notice-section {
       display: flex;
       align-items: center;
@@ -78,7 +77,6 @@
       text-overflow: ellipsis;
     }
 
-    /* 자세히 보기 버튼 스타일 */
     .notice-btn {
       font-size: 0.7rem;
       color: var(--accent-glow);
@@ -193,7 +191,6 @@
       100% { transform: scale(1) scaleX(var(--sx, 1)) scaleY(var(--sy, 1)); }
     }
 
-    /* 사이드바 스크롤 기능 복구 및 최적화 */
     .sidebar { 
       display: flex; 
       flex-direction: column; 
@@ -210,11 +207,10 @@
       border: 1px solid var(--border); 
       border-radius: var(--radius); 
       padding: 1.25rem;
-      flex-shrink: 0; /* 카드가 쪼그라들지 않도록 설정 */
+      flex-shrink: 0;
     }
     .card-title { font-size: 0.65rem; font-weight: 700; margin-bottom: 1rem; color: var(--accent-glow); text-transform: uppercase; letter-spacing: 1.5px; }
 
-    /* 피아노 롤 카드 크기 고정 및 확대 */
     .piano-roll-card { 
       height: 320px; 
       min-height: 320px; 
@@ -291,14 +287,29 @@
 
       <div class="card">
         <div class="card-title">Animation Controls</div>
-        <div class="control-group"><label class="control-label">인 애니메이션</label><select id="in-anim-select"><option value="none">없음</option><option value="pop">팝 (Pop)</option></select></div>
-        <div class="control-group"><label class="control-label">아웃 애니메이션</label><select id="out-anim-select"><option value="none">없음</option><option value="fade">페이드 아웃</option></select></div>
-        <div class="control-group"><label class="control-label">배경 헥스 코드</label><input type="text" id="hex-bg-input" placeholder="#000000" value="#000000"></div>
+        <div class="control-group">
+          <label class="control-label">인 애니메이션</label>
+          <select id="in-anim-select">
+            <option value="none">없음</option>
+            <option value="pop">팝 (Pop)</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <label class="control-label">아웃 애니메이션</label>
+          <select id="out-anim-select">
+            <option value="none">없음</option>
+            <option value="fade">페이드 아웃(실험적)</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <label class="control-label">배경 헥스 코드</label>
+          <input type="text" id="hex-bg-input" placeholder="#000000" value="#000000">
+        </div>
         <button id="play-btn" class="btn btn-primary" disabled>재생</button>
         <div style="height: 0.5rem;"></div>
         <button id="flip-h-btn" class="btn btn-secondary">좌우 반전</button>
         <div style="height: 0.4rem;"></div>
-        <button id="flip-v-btn" class="btn btn-secondary">상하 반전</button>
+        <button id="flip-v-btn" class="btn btn-secondary">상하 반전(실험적)</button>
       </div>
 
       <div class="card piano-roll-card">
@@ -318,7 +329,6 @@
     const APP = { midi: null, sampler: null, isPlaying: false, currentFlipX: 1, currentFlipY: 1, isFlipHMode: false, isFlipVMode: false, midiLoaded: false, mediaLoaded: false, activeNotes: new Set(), currentMediaUrl: null };
     const EL = { video: $('main-video'), vidBg: $('vid-bg'), viewport: $('viewport'), canvas: $('piano-roll'), ctx: $('piano-roll').getContext('2d'), playBtn: $('play-btn'), flipHBtn: $('flip-h-btn'), flipVBtn: $('flip-v-btn'), midiZone: $('midi-zone'), mediaZone: $('media-zone'), midiInput: $('midi-input'), mediaInput: $('media-input'), statusText: $('status-text'), statusDot: $('status-dot'), inAnim: $('in-anim-select'), outAnim: $('out-anim-select'), hexBg: $('hex-bg-input'), exportBtn: $('export-audio-btn'), progressBg: $('progress-bg'), progressFill: $('export-progress'), noticeBtn: $('notice-btn') };
 
-    // 자세히 보기 팝업 핸들러
     EL.noticeBtn.onclick = () => {
       const msg = "본 사이트를 통해 생성된 결과물은 자유롭게 사용 가능하며 출처 표기는 불필요합니다.\n\n" +
                   "단, 업로드한 파일의 저작권 및 사용 책임은 전적으로 사용자에게 있습니다.\n" +
