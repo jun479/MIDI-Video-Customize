@@ -124,7 +124,7 @@ MIDI Editor 기능으로 노트를 수정할 수 있습니다.
 
 ## 🙋예시
 
-| 크로마키 원본 영상 | 적용 결과 |
+| 크로마키 예시 | 다른 예시 |
 | :---: | :---: |
 | [![[크로마키 원본] Rainbow Tylenol](http://img.youtube.com/vi/X7b5QV6hYSk/0.jpg)](https://youtu.be/X7b5QV6hYSk?t=0s) | [![[적용 결과] MIDI-Video-Freeloading](http://img.youtube.com/vi/g1iHDYwgY7A/0.jpg)](https://youtu.be/g1iHDYwgY7A?t=0s) |
 
