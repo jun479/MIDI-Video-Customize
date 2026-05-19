@@ -126,7 +126,7 @@ MIDI Editor 기능으로 노트를 수정할 수 있습니다.
 
 | 크로마키 예시 | 다른 예시 |
 | :---: | :---: |
-| [![[크로마키 원본] Rainbow Tylenol](http://img.youtube.com/vi/X7b5QV6hYSk/0.jpg)](https://youtu.be/X7b5QV6hYSk?t=0s) | [![[적용 결과] MIDI-Video-Freeloading](http://img.youtube.com/vi/g1iHDYwgY7A/0.jpg)](https://youtu.be/g1iHDYwgY7A?t=0s) |
+| [![[크로마키 원본] Rainbow Tylenol](http://img.youtube.com/vi/X7b5QV6hYSk/0.jpg)](https://youtu.be/X7b5QV6hYSk?t=0s) | [![[적용 결과] MIDI-Video-Freeloading](http://img.youtube.com/vi/rWlk1PyKd9U/0.jpg)](https://youtu.be/rWlk1PyKd9U?t=0s) |
 
 > [!TIP]
 > 크로마키(Green/Blue Screen) 영상을 사용하면 배경을 쉽게 제거하고 다양한 영상 연출이 가능합니다.(좌측 예시 영상 참고)
